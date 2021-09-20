@@ -1,5 +1,6 @@
 ﻿public interface IGraphWindow 
 {
-    //Save or load
-    void RequestDataOperation(string fileName, bool save);
+    void SaveGraph(string fileName);
+
+    void LoadGraph(string fileName);
 }
