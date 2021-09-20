@@ -58,11 +58,5 @@ public class JsonService
         };
         return JsonConvert.SerializeObject(obj, settings);
     }
-
-    private void a()
-    {
-        object mesg = new { id = "ddd", x = false };
-        string s = ObjectToJson(mesg);
-    }
 }
 
