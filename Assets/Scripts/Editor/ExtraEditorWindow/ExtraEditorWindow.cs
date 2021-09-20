@@ -41,7 +41,10 @@ public class ExtraEditorWindow : EditorWindow, IExtraEditorWindow
             EditorUtility.DisplayDialog("Invalid file name!", "Please enter a valid file name", "ok");
             return;
         }
-        mGraphWindow.RequestDataOperation(fileName, save);
+        if(save) 
+            mGraphWindow.SaveGraph(fileName);
+        else 
+            mGraphWindow.LoadGraph(fileName);
     }
 
     private void OnDestroy()

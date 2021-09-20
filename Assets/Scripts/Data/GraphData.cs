@@ -2,10 +2,10 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-public class GraphData : MonoBehaviour
+public class GraphData
 {
     [JsonProperty("nodes")]
-    List<GraphNodeData> nodes = new List<GraphNodeData>();
+    public List<GraphNodeData> nodes = new List<GraphNodeData>();
     [JsonProperty("links")]
-    List<GraphNodeLinkData> links = new List<GraphNodeLinkData>();
+    public List<GraphNodeLinkData> links = new List<GraphNodeLinkData>();
 }

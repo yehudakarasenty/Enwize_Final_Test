@@ -54,6 +54,7 @@ public static class JsonService
         {
             NullValueHandling = ignoreNulls ? NullValueHandling.Ignore : NullValueHandling.Include,
             Formatting = indented ? Formatting.Indented : Formatting.None,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
         };
         return JsonConvert.SerializeObject(obj, settings);
     }

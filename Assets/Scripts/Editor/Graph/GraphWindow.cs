@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿using System.Linq;
+using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -62,16 +64,36 @@ public class GraphWindow : EditorWindow, IGraphWindow
         rootVisualElement.Add(toolbar);
     }
 
-    public void RequestDataOperation(string fileName, bool save)
+    public void SaveGraph(string fileName)
     {
-        //TODO
-        throw new System.NotImplementedException();
+        Debug.LogError("SaveGraph");
+        GraphData graphData = new GraphData();
+        foreach(GraphNode node in graph.nodes.ToList().Cast<GraphNode>().ToList())
+        {
+            graphData.nodes.Add(new GraphNodeData()
+            {
+                GUID = node.GUID,
+                Position = node.GetPosition().position,
+                type = node.type
+            });
+        }
+        foreach (Edge edgd in graph.edges.ToList())
+        {
+            graphData.links.Add(new GraphNodeLinkData()
+            {
+                BaseNodeGuid = ((GraphNode)edgd.output.node).GUID,
+                TargetNodeGuid = ((GraphNode)edgd.input.node).GUID,
+            });
+        }
+
+        string s = JsonService.ObjectToJson(graphData, false, true);
+        Debug.LogError(s);
     }
 
-    private  GraphData GetGraphData()
+    public void LoadGraph(string fileName)
     {
         //TODO
-        throw new System.NotImplementedException();
+        Debug.LogError("LoadGraph");
     }
 
     private void OnDisable()
