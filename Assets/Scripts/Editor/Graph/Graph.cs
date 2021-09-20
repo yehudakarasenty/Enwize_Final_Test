@@ -4,11 +4,14 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class GraphWindowView : GraphView
+/// <summary>
+/// Responsebility: View of the graph; Create and remove nodes
+/// </summary>
+public class Graph : GraphView
 {
     private readonly Vector2 nodeSize = new Vector2(150, 200);
 
-    public GraphWindowView()
+    public Graph()
     {
         //Add style
         styleSheets.Add(Resources.Load<StyleSheet>("Graph"));

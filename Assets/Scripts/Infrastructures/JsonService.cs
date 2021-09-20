@@ -2,10 +2,9 @@
 using System;
 using System.IO;
 
-//TODO static or single manager
-public class JsonService
+public static class JsonService
 {
-    public T ReadJsonFile<T>(string filePath)
+    public static T ReadJsonFile<T>(string filePath)
     {
         try
         {
@@ -20,7 +19,7 @@ public class JsonService
         }
     }
 
-    public void WriteJsonFile<T>(T obj, string filePath, bool ignoreNulls = false)
+    public static void WriteJsonFile<T>(T obj, string filePath, bool ignoreNulls = false)
     {
         try
         {
@@ -37,7 +36,7 @@ public class JsonService
         }
     }
 
-    public T JsonToObject<T>(string jsonString)
+    public static T JsonToObject<T>(string jsonString)
     {
         try
         {
@@ -49,7 +48,7 @@ public class JsonService
         }
     }
 
-    public string ObjectToJson<T>(T obj, bool ignoreNulls = false, bool indented = false)
+    public static string ObjectToJson<T>(T obj, bool ignoreNulls = false, bool indented = false)
     {
         JsonSerializerSettings settings = new JsonSerializerSettings()
         {
