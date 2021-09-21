@@ -34,6 +34,14 @@ public class Graph : GraphView
         CreateNode(GraphNodeType.ENTRY_NODE, new Vector2(100, 200));
 
         CreateMiniMap();
+        unserializeAndPaste += OnPast;
+    }
+
+    private void OnPast(string operationName, string data)
+    {
+        //TODO Duplicate
+        Debug.LogError("operationName: " + operationName);
+        Debug.LogError("data: " + data);
     }
 
     private void CreateMiniMap()
