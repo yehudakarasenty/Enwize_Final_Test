@@ -1,12 +1,12 @@
 ﻿using UnityEngine.UIElements;
 
-public class ExtraEditorWindowView : VisualElement
+public class GraphInspectorView : VisualElement
 {
     private IExtraEditorWindow mWindow;
 
     private string fileName = "new narrative";
 
-    public ExtraEditorWindowView(IExtraEditorWindow window)
+    public GraphInspectorView(IExtraEditorWindow window)
     {
         mWindow = window;
         CreateButtons();

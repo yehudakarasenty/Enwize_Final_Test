@@ -8,11 +8,11 @@ using UnityEngine.UIElements;
 /// <summary>
 /// Responsebility: Open and close graph window and comunicate with dependecies + save and load graph data
 /// </summary>
-public class GraphWindow : EditorWindow, IGraphWindow
+public class GraphWindowView : EditorWindow, IGraphWindow
 {
     private const string FILE_PATH = "C:/Users/yehud/Desktop/JsonsFiles/"; //TODO: to config
 
-    private Graph graph;
+    private GraphViewView graph;
 
     private void Awake()
     {
@@ -22,7 +22,7 @@ public class GraphWindow : EditorWindow, IGraphWindow
     [MenuItem("Graph/Graph Window")]
     public static void Open() 
     {
-        GetWindow<GraphWindow>().titleContent = new GUIContent("Graph");
+        GetWindow<GraphWindowView>().titleContent = new GUIContent("Graph");
     }
 
     private void OnEnable()
@@ -33,7 +33,7 @@ public class GraphWindow : EditorWindow, IGraphWindow
 
     private void ConsturctGraph()
     {
-        graph = new Graph
+        graph = new GraphViewView
         {
             name = "Graph"
         };
@@ -46,7 +46,7 @@ public class GraphWindow : EditorWindow, IGraphWindow
     {
         Toolbar toolbar = new Toolbar();
 
-        Button extraWindowOpenButton = new Button(() => { GetWindow<ExtraEditorWindow>().titleContent = new GUIContent("Editor Window"); });
+        Button extraWindowOpenButton = new Button(() => { GetWindow<GraphInspectorWindowView>().titleContent = new GUIContent("Editor Window"); });
         extraWindowOpenButton.text = "Open Extra Editor Window";
         toolbar.Add(extraWindowOpenButton);
 
@@ -69,7 +69,7 @@ public class GraphWindow : EditorWindow, IGraphWindow
     public void SaveGraph(string fileName)
     {
         GraphData graphData = new GraphData();
-        foreach(GraphNode node in graph.nodes.ToList().Cast<GraphNode>().ToList())
+        foreach(NodeView node in graph.nodes.ToList().Cast<NodeView>().ToList())
         {
             graphData.nodes.Add(new GraphNodeData()
             {
@@ -82,8 +82,8 @@ public class GraphWindow : EditorWindow, IGraphWindow
         {
             graphData.links.Add(new GraphNodeLinkData()
             {
-                BaseNodeGuid = ((GraphNode)edgd.output.node).GUID,
-                TargetNodeGuid = ((GraphNode)edgd.input.node).GUID,
+                BaseNodeGuid = ((NodeView)edgd.output.node).GUID,
+                TargetNodeGuid = ((NodeView)edgd.input.node).GUID,
                 portName = edgd.output.portName
             });
         }
@@ -104,8 +104,8 @@ public class GraphWindow : EditorWindow, IGraphWindow
 
         foreach (GraphNodeLinkData link in graphData.links)
         {
-            Node baseNode = graph.nodes.ToList().First(x => ((GraphNode)x).GUID == link.BaseNodeGuid);
-            Node targetNode = graph.nodes.ToList().First(x => ((GraphNode)x).GUID == link.TargetNodeGuid);
+            Node baseNode = graph.nodes.ToList().First(x => ((NodeView)x).GUID == link.BaseNodeGuid);
+            Node targetNode = graph.nodes.ToList().First(x => ((NodeView)x).GUID == link.TargetNodeGuid);
             int portIndex = int.Parse(link.portName.Substring(link.portName.IndexOf('-') + 1));
             LinkNodesTogether((Port)baseNode.outputContainer[portIndex], (Port)targetNode.inputContainer[0]);
         }
@@ -126,7 +126,7 @@ public class GraphWindow : EditorWindow, IGraphWindow
     private void OnDisable()
     {
         rootVisualElement.Remove(graph);
-        GetWindow<ExtraEditorWindow>().Close();
+        GetWindow<GraphInspectorWindowView>().Close();
     }
 
     private void OnDestroy()

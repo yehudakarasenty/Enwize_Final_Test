@@ -8,11 +8,11 @@ using UnityEngine.UIElements;
 /// <summary>
 /// Responsebility: View of the graph; Create and remove nodes
 /// </summary>
-public class Graph : GraphView
+public class GraphViewView : GraphView
 {
     private readonly Vector2 nodeSize = new Vector2(150, 200);
 
-    public Graph()
+    public GraphViewView()
     {
         //Add style
         styleSheets.Add(Resources.Load<StyleSheet>("Graph"));
@@ -51,14 +51,14 @@ public class Graph : GraphView
         Add(miniMap);
     }
 
-    private Port GeneratePort(GraphNode node, Direction portDiraction, Port.Capacity capacity = Port.Capacity.Single)
+    private Port GeneratePort(NodeView node, Direction portDiraction, Port.Capacity capacity = Port.Capacity.Single)
     {
         return node.InstantiatePort(Orientation.Horizontal, portDiraction, capacity, typeof(float)); // Arbitrary type
     }
 
-    public GraphNode CreateNode(GraphNodeType nodeType, Vector2 position, string guid = "")
+    public NodeView CreateNode(GraphNodeType nodeType, Vector2 position, string guid = "")
     {
-        GraphNode node = new GraphNode
+        NodeView node = new NodeView
         {
             title = nodeType.ToString(), //TODO need to be automatic
             GUID = string.IsNullOrEmpty(guid) ? Guid.NewGuid().ToString() : guid,
@@ -107,21 +107,21 @@ public class Graph : GraphView
                         startPort != port && startPort.node != port.node)
             {
                 //Exclusive node connection option //TODO by config
-                switch (((GraphNode)startPort.node).type)
+                switch (((NodeView)startPort.node).type)
                 {
                     case GraphNodeType.ENTRY_NODE:
                         compatiblePorts.Add(port);
                         break;
                     case GraphNodeType.NODE_1:
-                        if(((GraphNode)port.node).type == GraphNodeType.NODE_2)
+                        if(((NodeView)port.node).type == GraphNodeType.NODE_2)
                             compatiblePorts.Add(port);
                         break;
                     case GraphNodeType.NODE_2:
-                        if (((GraphNode)port.node).type == GraphNodeType.NODE_3)
+                        if (((NodeView)port.node).type == GraphNodeType.NODE_3)
                             compatiblePorts.Add(port);
                         break;
                     case GraphNodeType.NODE_3:
-                        if (((GraphNode)port.node).type == GraphNodeType.NODE_1)
+                        if (((NodeView)port.node).type == GraphNodeType.NODE_1)
                             compatiblePorts.Add(port);
                         break;
                     default:
@@ -135,7 +135,7 @@ public class Graph : GraphView
 
     public void ClearGraph()
     {
-        foreach (GraphNode node in nodes.ToList().Cast<GraphNode>().ToList())
+        foreach (NodeView node in nodes.ToList().Cast<NodeView>().ToList())
         {
             edges.ToList().Where(x => x.input.node == node).ToList()
                 .ForEach(edge => RemoveElement(edge));

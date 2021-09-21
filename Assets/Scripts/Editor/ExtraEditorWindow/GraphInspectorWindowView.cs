@@ -1,11 +1,11 @@
 ﻿using UnityEditor;
 using UnityEngine.UIElements;
 
-public class ExtraEditorWindow : EditorWindow, IExtraEditorWindow
+public class GraphInspectorWindowView : EditorWindow, IExtraEditorWindow
 {
     private IGraphWindow mGraphWindow;
 
-    private ExtraEditorWindowView view;
+    private GraphInspectorView view;
 
     private void Awake()
     {
@@ -20,7 +20,7 @@ public class ExtraEditorWindow : EditorWindow, IExtraEditorWindow
 
     private void ConsturctView()
     {
-        view = new ExtraEditorWindowView(this)
+        view = new GraphInspectorView(this)
         {
             name = "ExtraEditorWindow"
         };
