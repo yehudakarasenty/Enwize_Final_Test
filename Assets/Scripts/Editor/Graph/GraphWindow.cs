@@ -50,15 +50,15 @@ public class GraphWindow : EditorWindow, IGraphWindow
         extraWindowOpenButton.text = "Open Extra Editor Window";
         toolbar.Add(extraWindowOpenButton);
 
-        Button nodeCreateButton1 = new Button(() =>{ graph.CreateNode(GraphNodeType.NODE_1, Vector2.zero); }); //TO Understand: what is the parameter "node name" that I provide the string "Node"
+        Button nodeCreateButton1 = new Button(() =>{ graph.CreateNode(GraphNodeType.NODE_1, Vector2.zero); });
         nodeCreateButton1.text = "Create Node Type 1";
         toolbar.Add(nodeCreateButton1);
 
-        Button nodeCreateButton2 = new Button(() => { graph.CreateNode(GraphNodeType.NODE_2, Vector2.zero); }); //TO Understand: what is the parameter "node name" that I provide the string "Node"
+        Button nodeCreateButton2 = new Button(() => { graph.CreateNode(GraphNodeType.NODE_2, Vector2.zero); });
         nodeCreateButton2.text = "Create Node Type 2";
         toolbar.Add(nodeCreateButton2);
 
-        Button nodeCreateButton3 = new Button(() => { graph.CreateNode(GraphNodeType.NODE_3, Vector2.zero); }); //TO Understand: what is the parameter "node name" that I provide the string "Node"
+        Button nodeCreateButton3 = new Button(() => { graph.CreateNode(GraphNodeType.NODE_3, Vector2.zero); });
         nodeCreateButton3.text = "Create Node Type 3";
         toolbar.Add(nodeCreateButton3);
 
