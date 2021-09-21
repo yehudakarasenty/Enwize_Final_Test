@@ -32,6 +32,15 @@ public class Graph : GraphView
 
         //Create entry node
         CreateNode(GraphNodeType.ENTRY_NODE, new Vector2(100, 200));
+
+        CreateMiniMap();
+    }
+
+    private void CreateMiniMap()
+    {
+        MiniMap miniMap = new MiniMap() { anchored = true };
+        miniMap.SetPosition(new Rect(10, 30, 200, 140));
+        Add(miniMap);
     }
 
     private Port GeneratePort(GraphNode node, Direction portDiraction, Port.Capacity capacity = Port.Capacity.Single)
@@ -53,6 +62,11 @@ public class Graph : GraphView
             Port inputPort = GeneratePort(node, Direction.Input, Port.Capacity.Multi);
             inputPort.portName = "Input";
             node.inputContainer.Add(inputPort);
+        }
+        else
+        {
+            node.capabilities &= ~Capabilities.Movable;
+            node.capabilities &= ~Capabilities.Deletable;
         }
 
         Port outputPort = GeneratePort(node, Direction.Output);
@@ -80,7 +94,9 @@ public class Graph : GraphView
         List<Port> compatiblePorts = new List<Port>();
         ports.ForEach((port) =>
         {
-            if (startPort != port && startPort.node != port.node)
+            if (!(port.portName == "Input" && startPort.portName == "Input") &&
+                    !(port.portName.StartsWith("Output") && startPort.portName.StartsWith("Output")) &&
+                        startPort != port && startPort.node != port.node)
             {
                 //Exclusive node connection option //TODO by config
                 switch (((GraphNode)startPort.node).type)
