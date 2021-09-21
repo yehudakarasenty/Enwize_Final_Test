@@ -23,7 +23,11 @@ public static class JsonService
     {
         try
         {
-            if (File.Exists(filePath))
+            DirectoryInfo parentDir = Directory.GetParent(filePath);
+
+            if (!Directory.Exists(parentDir.FullName))
+                Directory.CreateDirectory(parentDir.FullName);
+            if (File.Exists(filePath)) //TODO delete? maybe to notify
                 File.Delete(filePath);
             string json = ObjectToJson(obj, ignoreNulls, true);
             StreamWriter writer = new StreamWriter(filePath, true);
