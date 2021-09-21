@@ -80,8 +80,30 @@ public class Graph : GraphView
         List<Port> compatiblePorts = new List<Port>();
         ports.ForEach((port) =>
         {
-            if (startPort != port && startPort.node != port.node) //TODO maybe here need to check Exclusive node connection option 
-                compatiblePorts.Add(port);
+            if (startPort != port && startPort.node != port.node)
+            {
+                //Exclusive node connection option //TODO by config
+                switch (((GraphNode)startPort.node).type)
+                {
+                    case GraphNodeType.ENTRY_NODE:
+                        compatiblePorts.Add(port);
+                        break;
+                    case GraphNodeType.NODE_1:
+                        if(((GraphNode)port.node).type == GraphNodeType.NODE_2)
+                            compatiblePorts.Add(port);
+                        break;
+                    case GraphNodeType.NODE_2:
+                        if (((GraphNode)port.node).type == GraphNodeType.NODE_3)
+                            compatiblePorts.Add(port);
+                        break;
+                    case GraphNodeType.NODE_3:
+                        if (((GraphNode)port.node).type == GraphNodeType.NODE_1)
+                            compatiblePorts.Add(port);
+                        break;
+                    default:
+                        break;
+                }
+            }
         });
 
         return compatiblePorts;
