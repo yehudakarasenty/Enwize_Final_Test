@@ -10,6 +10,8 @@ using UnityEngine.UIElements;
 /// </summary>
 public class GraphWindow : EditorWindow, IGraphWindow
 {
+    private const string FILE_PATH = "C:/Users/yehud/Desktop/JsonsFiles/"; //TODO: to config
+
     private Graph graph;
 
     private void Awake()
@@ -48,15 +50,15 @@ public class GraphWindow : EditorWindow, IGraphWindow
         extraWindowOpenButton.text = "Open Extra Editor Window";
         toolbar.Add(extraWindowOpenButton);
 
-        Button nodeCreateButton1 = new Button(() =>{ graph.CreateNode("Node_1", GraphNodeType.NODE_1); }); //TO Understand: what is the parameter "node name" that I provide the string "Node"
+        Button nodeCreateButton1 = new Button(() =>{ graph.CreateNode(GraphNodeType.NODE_1, Vector2.zero); }); //TO Understand: what is the parameter "node name" that I provide the string "Node"
         nodeCreateButton1.text = "Create Node Type 1";
         toolbar.Add(nodeCreateButton1);
 
-        Button nodeCreateButton2 = new Button(() => { graph.CreateNode("Node_2", GraphNodeType.NODE_2); }); //TO Understand: what is the parameter "node name" that I provide the string "Node"
+        Button nodeCreateButton2 = new Button(() => { graph.CreateNode(GraphNodeType.NODE_2, Vector2.zero); }); //TO Understand: what is the parameter "node name" that I provide the string "Node"
         nodeCreateButton2.text = "Create Node Type 2";
         toolbar.Add(nodeCreateButton2);
 
-        Button nodeCreateButton3 = new Button(() => { graph.CreateNode("Node_3", GraphNodeType.NODE_3); }); //TO Understand: what is the parameter "node name" that I provide the string "Node"
+        Button nodeCreateButton3 = new Button(() => { graph.CreateNode(GraphNodeType.NODE_3, Vector2.zero); }); //TO Understand: what is the parameter "node name" that I provide the string "Node"
         nodeCreateButton3.text = "Create Node Type 3";
         toolbar.Add(nodeCreateButton3);
 
@@ -66,7 +68,6 @@ public class GraphWindow : EditorWindow, IGraphWindow
 
     public void SaveGraph(string fileName)
     {
-        Debug.LogError("SaveGraph");
         GraphData graphData = new GraphData();
         foreach(GraphNode node in graph.nodes.ToList().Cast<GraphNode>().ToList())
         {
@@ -83,17 +84,43 @@ public class GraphWindow : EditorWindow, IGraphWindow
             {
                 BaseNodeGuid = ((GraphNode)edgd.output.node).GUID,
                 TargetNodeGuid = ((GraphNode)edgd.input.node).GUID,
+                portName = edgd.output.portName
             });
         }
 
-        string s = JsonService.ObjectToJson(graphData, false, true);
-        Debug.LogError(s);
+        JsonService.WriteJsonFile(graphData, FILE_PATH + fileName);
     }
 
     public void LoadGraph(string fileName)
     {
-        //TODO
-        Debug.LogError("LoadGraph");
+        graph.ClearGraph();
+
+        GraphData graphData = JsonService.ReadJsonFile<GraphData>(FILE_PATH + fileName);
+
+        foreach (GraphNodeData nodeData in graphData.nodes)
+        {
+            graph.CreateNode(nodeData.type, nodeData.Position, nodeData.GUID);
+        }
+
+        foreach (GraphNodeLinkData link in graphData.links)
+        {
+            Node baseNode = graph.nodes.ToList().First(x => ((GraphNode)x).GUID == link.BaseNodeGuid);
+            Node targetNode = graph.nodes.ToList().First(x => ((GraphNode)x).GUID == link.TargetNodeGuid);
+            int portIndex = int.Parse(link.portName.Substring(link.portName.IndexOf('-') + 1));
+            LinkNodesTogether((Port)baseNode.outputContainer[portIndex], (Port)targetNode.inputContainer[0]);
+        }
+    }
+
+    private void LinkNodesTogether(Port outputSocket, Port inputSocket)
+    {
+        Edge tempEdge = new Edge()
+        {
+            output = outputSocket,
+            input = inputSocket
+        };
+        tempEdge.input.Connect(tempEdge);
+        tempEdge.output.Connect(tempEdge);
+        graph.Add(tempEdge);
     }
 
     private void OnDisable()

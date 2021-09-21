@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -29,7 +30,8 @@ public class Graph : GraphView
         Insert(0, gridBackground);
         gridBackground.StretchToParentSize();
 
-        CreateEntryNode();
+        //Create entry node
+        CreateNode(GraphNodeType.ENTRY_NODE, new Vector2(100, 200));
     }
 
     private Port GeneratePort(GraphNode node, Direction portDiraction, Port.Capacity capacity = Port.Capacity.Single)
@@ -37,56 +39,37 @@ public class Graph : GraphView
         return node.InstantiatePort(Orientation.Horizontal, portDiraction, capacity, typeof(float)); // Arbitrary type
     }
 
-    public GraphNode CreateNode(string nodeName, GraphNodeType nodeType)
+    public GraphNode CreateNode(GraphNodeType nodeType, Vector2 position, string guid = "")
     {
         GraphNode node = new GraphNode
         {
-            title = nodeName,
-            GUID = Guid.NewGuid().ToString(),
+            title = nodeType.ToString(), //TODO need to be automatic
+            GUID = string.IsNullOrEmpty(guid) ? Guid.NewGuid().ToString() : guid,
             type = nodeType
         };
 
-        Port inputPort = GeneratePort(node, Direction.Input, Port.Capacity.Multi);
-        inputPort.portName = "Input";
-        node.inputContainer.Add(inputPort);
+        if (nodeType != GraphNodeType.ENTRY_NODE)
+        {
+            Port inputPort = GeneratePort(node, Direction.Input, Port.Capacity.Multi);
+            inputPort.portName = "Input";
+            node.inputContainer.Add(inputPort);
+        }
 
         Port outputPort = GeneratePort(node, Direction.Output);
-        outputPort.portName = "Next"; //TO Understand: different from him, becuse he named it by choice
+        outputPort.portName = "Output-0";
         node.outputContainer.Add(outputPort);
 
         if(nodeType == GraphNodeType.NODE_3)
         {
             Port secondOutputPort = GeneratePort(node, Direction.Output);
-            secondOutputPort.portName = "Next"; //TO Understand: different from him, becuse he named it by choice
+            secondOutputPort.portName = "Output-1";
             node.outputContainer.Add(secondOutputPort);
         }
 
         node.RefreshExpandedState();
         node.RefreshPorts();
-        node.SetPosition(new Rect(Vector2.zero, nodeSize));
+        node.SetPosition(new Rect(position, nodeSize));
 
-        AddElement(node);
-
-        return node;
-    }
-
-    private GraphNode CreateEntryNode()
-    {
-        GraphNode node = new GraphNode
-        {
-            title = "Start",
-            GUID = Guid.NewGuid().ToString(),
-            type = GraphNodeType.ENTRY_NODE
-        };
-
-        Port port = GeneratePort(node, Direction.Output);
-        port.portName = "Next"; //To understand. for saving?
-        node.outputContainer.Add(port);
-
-        node.RefreshExpandedState();
-        node.RefreshPorts();
-
-        node.SetPosition(new Rect(new Vector2(100,200), nodeSize));
         AddElement(node);
 
         return node;
@@ -102,5 +85,15 @@ public class Graph : GraphView
         });
 
         return compatiblePorts;
+    }
+
+    public void ClearGraph()
+    {
+        foreach (GraphNode node in nodes.ToList().Cast<GraphNode>().ToList())
+        {
+            edges.ToList().Where(x => x.input.node == node).ToList()
+                .ForEach(edge => RemoveElement(edge));
+            RemoveElement(node);
+        }
     }
 }
