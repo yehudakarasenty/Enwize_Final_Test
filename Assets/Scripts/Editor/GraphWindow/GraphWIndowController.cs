@@ -56,12 +56,14 @@ public class GraphWIndowController : IGraphWindowController
     {
         if (mView != null)
             mView.LoadGraphData(JsonService.ReadJsonFile<GraphData>(filePath + fileName));
+        Debug.Log("Graph Loaded");
     }
 
     public void SaveGraph(string fileName)
     {
         if (mView != null)
             JsonService.WriteJsonFile(mView.GetGraphData(), filePath + fileName);
+        Debug.Log("Graph Saved");
     }
 
     public void RegisterToNodeSelectionsChange(UnityAction action)
