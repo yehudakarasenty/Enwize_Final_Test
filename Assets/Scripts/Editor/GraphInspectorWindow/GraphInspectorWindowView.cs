@@ -18,7 +18,7 @@ public class GraphInspectorWindowView : EditorWindow, IGraphInspectorWindowView
     {
         view = new GraphInspectorView()
         {
-            name = "ExtraEditorWindow"
+            name = "AdditionalEditorWindow"
         };
 
         view.RegisterToOnLoadClick(LoadClicked);
@@ -28,19 +28,19 @@ public class GraphInspectorWindowView : EditorWindow, IGraphInspectorWindowView
         rootVisualElement.Add(view);
     }
 
-    public void ShowExtraDataFields(NodeExtraData extraData)
+    public void ShowAdditionalDataFields(NodeAdditionalData additionalData)
     {
-        view.ShowExtraDataFileds(extraData);
+        view.ShowAdditionalDataFileds(additionalData);
     }
 
-    public void HideExtraDataFields()
+    public void HideAdditionalDataFields()
     {
-        view.HideExtraDataFileds();
+        view.HideAdditionalDataFileds();
     }
 
-    public void RegisterToOnExtraDataFieldsChange(UnityAction action)
+    public void RegisterToOnAdditionalDataFieldsChange(UnityAction action)
     {
-        view.RegisterToOnExtraDataChange(action);
+        view.RegisterToOnAdditionalDataChange(action);
     }
 
     private void SaveClicked()
@@ -63,9 +63,9 @@ public class GraphInspectorWindowView : EditorWindow, IGraphInspectorWindowView
         mWindowController.LoadClicked(view.FileName);
     }
 
-    public NodeExtraData GetNodeExtraDataFields()
+    public NodeAdditionalData GetNodeAdditionalDataFields()
     {
-        return new NodeExtraData(int.Parse(view.SpecialNumberText), view.SpecialSecretText);
+        return new NodeAdditionalData(int.Parse(view.SpecialNumberText), view.SpecialSecretText);
     }
 
     public void OnDisable()

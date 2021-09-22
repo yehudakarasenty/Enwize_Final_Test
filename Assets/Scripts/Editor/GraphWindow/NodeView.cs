@@ -5,13 +5,13 @@ public class NodeView : Node
 {
     public string GUID;
     public GraphNodeType Type;
-    public NodeExtraData NodeExtraData;
+    public NodeAdditionalData NodeAdditionalData;
     private UnityEvent OnSelecteChange = new UnityEvent();
-    public NodeView(string gUID, GraphNodeType type, NodeExtraData nodeExtraData)
+    public NodeView(string gUID, GraphNodeType type, NodeAdditionalData nodeAdditionalData)
     {
         GUID = gUID;
         Type = type;
-        NodeExtraData = nodeExtraData;
+        NodeAdditionalData = nodeAdditionalData;
     }
 
     public override void OnSelected()

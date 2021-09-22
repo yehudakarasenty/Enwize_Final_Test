@@ -23,13 +23,13 @@ public class GraphWIndowController : IGraphWindowController
     public void InitDependencies()
     {
         mGraphInspectorWindowController = SingleManager.Get<IGraphInspectorWindowController>();
-        mGraphInspectorWindowController.RegisterToOnExtraDataFieldsChange(OnExtraDataInspectorChange);
+        mGraphInspectorWindowController.RegisterToOnAdditionalDataFieldsChange(OnAdditionalDataInspectorChange);
     }
 
-    private void OnExtraDataInspectorChange()
+    private void OnAdditionalDataInspectorChange()
     {
-        NodeExtraData nodeExtraData = mGraphInspectorWindowController.NodeExtraDataFields();
-        mView.InjectExtraDataToSelectionNodes(nodeExtraData);
+        NodeAdditionalData nodeAdditionalData = mGraphInspectorWindowController.NodeAdditionalDataFields();
+        mView.InjectAdditionalDataToSelectionNodes(nodeAdditionalData);
     }
 
     public void SetView(IGraphWindowView view)
@@ -48,7 +48,7 @@ public class GraphWIndowController : IGraphWindowController
 
     private void OnCreateNodeButtonClick(GraphNodeType nodeType)
     {
-        mView.CreateNode(nodeType, Vector2.zero, new NodeExtraData());
+        mView.CreateNode(nodeType, Vector2.zero, new NodeAdditionalData());
     }
 
     public void LoadGraph(string fileName)

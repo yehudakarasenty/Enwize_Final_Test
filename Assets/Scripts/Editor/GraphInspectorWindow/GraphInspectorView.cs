@@ -8,7 +8,7 @@ public class GraphInspectorView : VisualElement
 
     private UnityEvent onSaveClick = new UnityEvent();
     private UnityEvent onLoadClick = new UnityEvent();
-    private UnityEvent onExtraDataChange = new UnityEvent();
+    private UnityEvent onAdditionalDataChange = new UnityEvent();
 
     TextField specialSecretTextField;
     TextField specialNumberTextField;
@@ -42,36 +42,36 @@ public class GraphInspectorView : VisualElement
         specialSecretTextField = new TextField("My Special Secret");
         specialSecretTextField.MarkDirtyRepaint();//TO Understand
 
-        specialNumberTextField.RegisterValueChangedCallback(evt => OnExtraDataChange());
-        specialSecretTextField.RegisterValueChangedCallback(evt => OnExtraDataChange());
+        specialNumberTextField.RegisterValueChangedCallback(evt => OnAdditionalDataChange());
+        specialSecretTextField.RegisterValueChangedCallback(evt => OnAdditionalDataChange());
 
         Add(specialNumberTextField);
         Add(specialSecretTextField);
-        HideExtraDataFileds();
+        HideAdditionalDataFileds();
     }
 
-    private void OnExtraDataChange()
+    private void OnAdditionalDataChange()
     {
         if (string.IsNullOrEmpty(specialNumberTextField.value))
             specialNumberTextField.SetValueWithoutNotify("0");
         else
             specialNumberTextField.SetValueWithoutNotify(Regex.Replace(specialNumberTextField.value, "[^0-9]", ""));
-        onExtraDataChange.Invoke();
+        onAdditionalDataChange.Invoke();
     }
 
-    public void HideExtraDataFileds()
+    public void HideAdditionalDataFileds()
     {
         specialSecretTextField.visible = false;
         specialNumberTextField.visible = false;
     }
 
-    public void ShowExtraDataFileds(NodeExtraData extraData)
+    public void ShowAdditionalDataFileds(NodeAdditionalData additionalData)
     {
         specialNumberTextField.visible = true;
         specialSecretTextField.visible = true;
 
-        specialNumberTextField.SetValueWithoutNotify(extraData.mySpecialNumber.ToString());
-        specialSecretTextField.SetValueWithoutNotify(extraData.mySpecialSecret);
+        specialNumberTextField.SetValueWithoutNotify(additionalData.mySpecialNumber.ToString());
+        specialSecretTextField.SetValueWithoutNotify(additionalData.mySpecialSecret);
     }
 
     public void RegisterToOnSaveClick(UnityAction action)
@@ -94,13 +94,13 @@ public class GraphInspectorView : VisualElement
         onLoadClick.RemoveListener(action);
     }
 
-    public void RegisterToOnExtraDataChange(UnityAction action)
+    public void RegisterToOnAdditionalDataChange(UnityAction action)
     {
-        onExtraDataChange.AddListener(action);
+        onAdditionalDataChange.AddListener(action);
     }
 
-    public void RemoveFromOnExtraDataChange(UnityAction action)
+    public void RemoveFromOnAdditionalDataChange(UnityAction action)
     {
-        onExtraDataChange.RemoveListener(action);
+        onAdditionalDataChange.RemoveListener(action);
     }
 }

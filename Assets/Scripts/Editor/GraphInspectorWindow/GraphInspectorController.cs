@@ -5,7 +5,7 @@ public class GraphInspectorController : IGraphInspectorWindowController
     private IGraphWindowController mGraphWindowController;
     private IGraphInspectorWindowView mView;
 
-    private UnityEvent onExtraDataFieldsChange = new UnityEvent();
+    private UnityEvent onAdditionalDataFieldsChange = new UnityEvent();
 
     public GraphInspectorController()
     {
@@ -22,15 +22,15 @@ public class GraphInspectorController : IGraphInspectorWindowController
     {
         if (mView != null)
         {
-            mView.HideExtraDataFields();
+            mView.HideAdditionalDataFields();
             if (mGraphWindowController.NodesSelections.Count > 0 &&
                  mGraphWindowController.NodesSelections.TrueForAll
-                 (x => ExtraDataIsEqual(x.extraData , mGraphWindowController.NodesSelections[0].extraData)))
-                mView.ShowExtraDataFields(mGraphWindowController.NodesSelections[0].extraData);
+                 (x => AdditionalDataIsEqual(x.additionalData , mGraphWindowController.NodesSelections[0].additionalData)))
+                mView.ShowAdditionalDataFields(mGraphWindowController.NodesSelections[0].additionalData);
         }
     }
 
-    private bool ExtraDataIsEqual(NodeExtraData node1, NodeExtraData node2)
+    private bool AdditionalDataIsEqual(NodeAdditionalData node1, NodeAdditionalData node2)
     {
         return node1.mySpecialNumber == node2.mySpecialNumber && node1.mySpecialSecret == node2.mySpecialSecret;
     }
@@ -39,7 +39,7 @@ public class GraphInspectorController : IGraphInspectorWindowController
     {
         mView = view;
         mView.ConsturctView();
-        mView.RegisterToOnExtraDataFieldsChange(OnExtraDataFieldsChange);
+        mView.RegisterToOnAdditionalDataFieldsChange(OnAdditionalDataFieldsChange);
         NodeSelectionsChange();
     }
 
@@ -53,21 +53,21 @@ public class GraphInspectorController : IGraphInspectorWindowController
         mGraphWindowController.SaveGraph(fileName);
     }
 
-    public void RegisterToOnExtraDataFieldsChange(UnityAction action)
+    public void RegisterToOnAdditionalDataFieldsChange(UnityAction action)
     {
-        onExtraDataFieldsChange.AddListener(action);
+        onAdditionalDataFieldsChange.AddListener(action);
     }
 
-    private void OnExtraDataFieldsChange()
+    private void OnAdditionalDataFieldsChange()
     {
-        onExtraDataFieldsChange.Invoke();
+        onAdditionalDataFieldsChange.Invoke();
     }
 
-    public NodeExtraData NodeExtraDataFields()
+    public NodeAdditionalData NodeAdditionalDataFields()
     {
         if (mView != null)
-            return mView.GetNodeExtraDataFields();
+            return mView.GetNodeAdditionalDataFields();
         else
-            return new NodeExtraData();
+            return new NodeAdditionalData();
     }
 }

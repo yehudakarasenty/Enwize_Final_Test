@@ -8,7 +8,7 @@ public interface IGraphInspectorWindowController : IController
 
     void LoadClicked(string fileName);
 
-    void RegisterToOnExtraDataFieldsChange(UnityAction action);
+    void RegisterToOnAdditionalDataFieldsChange(UnityAction action);
 
-    NodeExtraData NodeExtraDataFields();
+    NodeAdditionalData NodeAdditionalDataFields();
 }

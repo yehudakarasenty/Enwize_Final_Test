@@ -13,5 +13,5 @@ public class GraphNodeData
     [JsonProperty("Type")]
     public GraphNodeType type;
     [JsonProperty("ExtraData")]
-    public NodeExtraData extraData;
+    public NodeAdditionalData additionalData;
 }

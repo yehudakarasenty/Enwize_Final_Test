@@ -3,8 +3,8 @@
 public interface IGraphInspectorWindowView
 {
     void ConsturctView();
-    void ShowExtraDataFields(NodeExtraData extraData);
-    void HideExtraDataFields();
-    void RegisterToOnExtraDataFieldsChange(UnityAction action);
-    NodeExtraData GetNodeExtraDataFields();
+    void ShowAdditionalDataFields(NodeAdditionalData extraData);
+    void HideAdditionalDataFields();
+    void RegisterToOnAdditionalDataFieldsChange(UnityAction action);
+    NodeAdditionalData GetNodeAdditionalDataFields();
 }

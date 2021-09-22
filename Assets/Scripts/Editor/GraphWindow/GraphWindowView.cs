@@ -74,9 +74,9 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
         rootVisualElement.Add(toolbar);
     }
 
-    public void CreateNode(GraphNodeType nodeType, Vector2 position, NodeExtraData extraData)
+    public void CreateNode(GraphNodeType nodeType, Vector2 position, NodeAdditionalData additionalData)
     {
-        graph.CreateNode(nodeType, position, extraData);
+        graph.CreateNode(nodeType, position, additionalData);
     }
 
     public GraphData GetGraphData()
@@ -89,7 +89,7 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
                 GUID = node.GUID,
                 Position = node.GetPosition().position,
                 type = node.Type,
-                extraData = node.NodeExtraData
+                additionalData = node.NodeAdditionalData
             });
         }
         foreach (Edge edge in graph.edges.ToList())
@@ -108,7 +108,7 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
     {
         ClearGraph();
         foreach (GraphNodeData nodeData in graphData.nodes)
-            graph.CreateNode(nodeData.type, nodeData.Position, nodeData.extraData, nodeData.GUID);
+            graph.CreateNode(nodeData.type, nodeData.Position, nodeData.additionalData, nodeData.GUID);
 
         foreach (GraphNodeLinkData link in graphData.links)
         {
@@ -145,7 +145,7 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
                 if (node.Type!=GraphNodeType.ENTRY_NODE)
                     nodesSelection.Add(new GraphNodeData()
                     {
-                        extraData = node.NodeExtraData,
+                        additionalData = node.NodeAdditionalData,
                         GUID = node.GUID,
                         Position = node.GetPosition().position,
                         type = node.Type
@@ -155,14 +155,14 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
         return nodesSelection;
     }
 
-    public void InjectExtraDataToSelectionNodes(NodeExtraData nodeExtraData)
+    public void InjectAdditionalDataToSelectionNodes(NodeAdditionalData nodeAdditionalData)
     {
         foreach (ISelectable selectable in graph.selection)
         {
             if (selectable.GetType() == typeof(NodeView))
             {
                 NodeView node = (NodeView)selectable;
-                node.NodeExtraData = new NodeExtraData(nodeExtraData);
+                node.NodeAdditionalData = new NodeAdditionalData(nodeAdditionalData);
             }
         }
     }

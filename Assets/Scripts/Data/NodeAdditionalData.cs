@@ -1,22 +1,22 @@
 ﻿using Newtonsoft.Json;
-public class NodeExtraData
+public class NodeAdditionalData
 {
     [JsonProperty("mySpecialNumber")]
     public int mySpecialNumber;
     [JsonProperty("mySpecialSecret ")]
     public string mySpecialSecret;
 
-    public NodeExtraData()
+    public NodeAdditionalData()
     {
     }
 
-    public NodeExtraData(NodeExtraData copy)
+    public NodeAdditionalData(NodeAdditionalData copy)
     {
         mySpecialNumber = copy.mySpecialNumber;
         mySpecialSecret = copy.mySpecialSecret;
     }
 
-    public NodeExtraData(int mySpecialNumber, string mySpecialSecret)
+    public NodeAdditionalData(int mySpecialNumber, string mySpecialSecret)
     {
         this.mySpecialNumber = mySpecialNumber;
         this.mySpecialSecret = mySpecialSecret;
