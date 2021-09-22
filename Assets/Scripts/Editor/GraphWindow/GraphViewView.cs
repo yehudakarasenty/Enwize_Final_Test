@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using Unity.EditorCoroutines.Editor;
 using UnityEngine.UIElements;
+using System.Collections;
 
 /// <summary>
 /// Responsebility: View of the graph; Create and remove nodes
@@ -41,30 +43,34 @@ public class GraphViewView : GraphView
 
     private GraphViewChange GraphChanged(GraphViewChange graphViewChange)
     {
-        UpdateNodesTitles(); //TODO
+        EditorCoroutineUtility.StartCoroutine(UpdateNodesTitles(), this);
         return graphViewChange;
     }
 
-    private void UpdateNodesTitles()
+    private IEnumerator UpdateNodesTitles()
     {
-        return;
-        nodes.ForEach(x => x.title = "not connected");
+        yield return null; //Changes are update in the end of the frame.
+        nodes.ForEach(x => x.title = ((NodeView)x).type == GraphNodeType.ENTRY_NODE ? "Entry Point" : "not connected (" + ((NodeView)x).type.ToString().ToLower().Replace('_', '-') + ")");
         connectedCounter = 0;
-        Node firstNode = nodes.ToList()[0];
-        firstNode.title = "Start";
-        MarkAsConnected(((Port)firstNode.outputContainer[0]).node);
-        Debug.LogError("UpdateNodesTitles");
+        NodeView firstNode = (NodeView)nodes.ToList()[0];
+        MarkAsConnected(firstNode);
     }
 
-    private void MarkAsConnected(Node node)
+    private void MarkAsConnected(NodeView node)
     {
-        Debug.Break();
-        Debug.LogError("connectedCounter: " + connectedCounter);
-        connectedCounter++;
-        node.title = "Node: " + connectedCounter;
-        if (node.outputContainer.childCount > 0)
-            for (int i = 0; i < node.outputContainer.childCount; i++)
-                MarkAsConnected(((Port)node.outputContainer[i]).node);
+        if (node.type != GraphNodeType.ENTRY_NODE)
+        {
+            connectedCounter++;
+            node.title = node.type == GraphNodeType.ENTRY_NODE ? "Start" : "connected  (" + node.type.ToString().ToLower().Replace('_', '-') + "),  N-" + connectedCounter;
+        }
+
+        List<NodeView> connectedNode = new List<NodeView>();
+        foreach (Edge edge in edges.ToList())
+            if (((NodeView)edge.output.node).GUID == node.GUID)
+                connectedNode.Add((NodeView)edge.input.node);
+
+        for (int i = 0; i < connectedNode.Count; i++)
+            MarkAsConnected(connectedNode[i]);
     }
 
     private void OnDuplicateClicked(string operationName, string data)
@@ -121,7 +127,6 @@ public class GraphViewView : GraphView
     {
         NodeView node = new NodeView
         {
-            title = nodeType == GraphNodeType.ENTRY_NODE? "Start" : "not connected  (" + nodeType.ToString().ToLower().Replace('_','-') +")",
             GUID = string.IsNullOrEmpty(guid) ? Guid.NewGuid().ToString() : guid,
             type = nodeType
         };
@@ -155,6 +160,8 @@ public class GraphViewView : GraphView
         AddStyle(node);
 
         AddElement(node);
+        EditorCoroutineUtility.StartCoroutine(UpdateNodesTitles(), this);
+
         return node;
     }
 

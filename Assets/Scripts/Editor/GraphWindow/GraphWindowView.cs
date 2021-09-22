@@ -82,13 +82,13 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
                 type = node.type
             });
         }
-        foreach (Edge edgd in graph.edges.ToList())
+        foreach (Edge edge in graph.edges.ToList())
         {
             graphData.links.Add(new GraphNodeLinkData()
             {
-                BaseNodeGuid = ((NodeView)edgd.output.node).GUID,
-                TargetNodeGuid = ((NodeView)edgd.input.node).GUID,
-                portName = edgd.output.portName
+                BaseNodeGuid = ((NodeView)edge.output.node).GUID,
+                TargetNodeGuid = ((NodeView)edge.input.node).GUID,
+                portName = edge.output.portName
             });
         }
         return graphData;
