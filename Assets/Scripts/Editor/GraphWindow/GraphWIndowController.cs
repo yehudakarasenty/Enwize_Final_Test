@@ -1,6 +1,5 @@
-﻿using System.Collections;
-using UnityEngine;
-
+﻿using UnityEngine;
+using UnityEngine.Events;
 
 public class GraphWIndowController : IGraphWindowController
 {
@@ -22,6 +21,12 @@ public class GraphWIndowController : IGraphWindowController
     {
         mView = view;
         mView.ConsturctGraph();
+        mView.RegisterToOnCreateNodeClickEvent(new UnityAction<GraphNodeType>(OnCreateNodeButtonClick));
+    }
+
+    private void OnCreateNodeButtonClick(GraphNodeType nodeType)
+    {
+        mView.CreateNode(nodeType, Vector2.zero);
     }
 
     public void LoadGraph(string fileName)

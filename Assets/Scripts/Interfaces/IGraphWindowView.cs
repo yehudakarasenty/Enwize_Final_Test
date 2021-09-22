@@ -1,5 +1,5 @@
-﻿using UnityEditor.Experimental.GraphView;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.Events;
 
 public interface IGraphWindowView
 {
@@ -7,4 +7,6 @@ public interface IGraphWindowView
     void LoadGraphData(GraphData graphData);
     void ConsturctGraph();
     void ClearGraph();
+    void RegisterToOnCreateNodeClickEvent(UnityAction<GraphNodeType> action);
+    void CreateNode(GraphNodeType nodeType, Vector2 position);
 }
