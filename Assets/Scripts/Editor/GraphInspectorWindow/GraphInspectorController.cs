@@ -11,6 +11,24 @@
     public void InitDependencies()
     {
         mGraphWindowController = SingleManager.Get<IGraphWindowController>();
+        mGraphWindowController.RegisterToNodeSelectionsChange(NodeSelectionsChange);
+    }
+
+    private void NodeSelectionsChange()
+    {
+        if (mView != null)
+        {
+            mView.HideExtraDataFields();
+            if (mGraphWindowController.NodesSelections.Count > 0 &&
+                 mGraphWindowController.NodesSelections.TrueForAll
+                 (x => ExtraDataIsEqual(x.extraData , mGraphWindowController.NodesSelections[0].extraData)))
+                mView.ShowExtraDataFields(mGraphWindowController.NodesSelections[0].extraData);
+        }
+    }
+
+    private bool ExtraDataIsEqual(NodeExtraData node1, NodeExtraData node2)
+    {
+        return node1.mySpecialNumber == node2.mySpecialNumber && node1.mySpecialSecret == node2.mySpecialSecret;
     }
 
     public void SetView(IGraphInspectorWindowView view)

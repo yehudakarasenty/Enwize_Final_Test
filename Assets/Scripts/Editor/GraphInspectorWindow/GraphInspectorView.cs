@@ -5,47 +5,89 @@ public class GraphInspectorView : VisualElement
 {
     public string FileName { get; private set; } = "new narrative";
 
-    private UnityEvent OnSaveClick = new UnityEvent();
-    private UnityEvent OnLoadClick = new UnityEvent();
+    private UnityEvent onSaveClick = new UnityEvent();
+    private UnityEvent onLoadClick = new UnityEvent();
+    private UnityEvent onExtraDataChange = new UnityEvent();
+
+    TextField specialSecretTextField;
+    TextField specialNumberTextField;
 
     public GraphInspectorView()
     {
-        CreateButtons();
+        CreateElements();
     }
 
-    private void CreateButtons()
+    private void CreateElements()
     {
-        Button saveButtons = new Button(()=> OnSaveClick.Invoke()) { text = "Save Graph" };
+        Button saveButtons = new Button(()=> onSaveClick.Invoke()) { text = "Save Graph" };
         Add(saveButtons);
 
-        Button loadButtons = new Button(() => OnLoadClick.Invoke()) {text = "Load Graph" };
+        Button loadButtons = new Button(() => onLoadClick.Invoke()) {text = "Load Graph" };
         Add(loadButtons);
 
         TextField fileNameTestField = new TextField("File Name");
         fileNameTestField.SetValueWithoutNotify(FileName);
-        fileNameTestField.MarkDirtyRepaint();
+        fileNameTestField.MarkDirtyRepaint();//TO Understand
         fileNameTestField.RegisterValueChangedCallback(evt => FileName = evt.newValue);
 
         Add(fileNameTestField);
+
+        specialNumberTextField = new TextField("My Special Number");
+        specialNumberTextField.MarkDirtyRepaint();//TO Understand
+
+        specialSecretTextField = new TextField("My Special Secret");
+        specialSecretTextField.MarkDirtyRepaint();//TO Understand
+
+        specialNumberTextField.RegisterValueChangedCallback(evt => onExtraDataChange.Invoke());
+        specialSecretTextField.RegisterValueChangedCallback(evt => onExtraDataChange.Invoke());
+
+        Add(specialNumberTextField);
+        Add(specialSecretTextField);
+        HideExtraDataFileds();
+    }
+
+    public void HideExtraDataFileds()
+    {
+        specialSecretTextField.visible = false;
+        specialNumberTextField.visible = false;
+    }
+
+    public void ShowExtraDataFileds(NodeExtraData extraData)
+    {
+        specialNumberTextField.visible = true;
+        specialSecretTextField.visible = true;
+
+        specialNumberTextField.SetValueWithoutNotify(extraData.mySpecialNumber.ToString());
+        specialSecretTextField.SetValueWithoutNotify(extraData.mySpecialSecret);
     }
 
     public void RegisterToOnSaveClick(UnityAction action)
     {
-        OnSaveClick.AddListener(action);
+        onSaveClick.AddListener(action);
     }
 
     public void RemoveFromOnSaveClick(UnityAction action)
     {
-        OnSaveClick.RemoveListener(action);
+        onSaveClick.RemoveListener(action);
     }
 
     public void RegisterToOnLoadClick(UnityAction action)
     {
-        OnLoadClick.AddListener(action);
+        onLoadClick.AddListener(action);
     }
 
     public void RemoveFromOnLoadClick(UnityAction action)
     {
-        OnLoadClick.RemoveListener(action);
+        onLoadClick.RemoveListener(action);
+    }
+
+    public void RegisterToOnExtraDataChange(UnityAction action)
+    {
+        onExtraDataChange.AddListener(action);
+    }
+
+    public void RemoveFromOnExtraDataChange(UnityAction action)
+    {
+        onExtraDataChange.RemoveListener(action);
     }
 }

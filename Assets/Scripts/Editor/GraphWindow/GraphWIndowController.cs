@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -7,6 +8,10 @@ public class GraphWIndowController : IGraphWindowController
     private const string FILE_PATH = "C:/Users/yehud/Desktop/JsonsFiles/"; //TODO: to config
 
     private IGraphWindowView mView;
+
+    public List<GraphNodeData> NodesSelections => mView.GetNodesSelectionList();
+
+    private UnityEvent onNodesSelectionsChange = new UnityEvent();
 
     public GraphWIndowController()
     {
@@ -24,11 +29,13 @@ public class GraphWIndowController : IGraphWindowController
         mView = view;
         mView.ConsturctGraph();
         mView.RegisterToOnCreateNodeClickEvent(new UnityAction<GraphNodeType>(OnCreateNodeButtonClick));
+        mView.RegisterToOnNodesSelectionChange(()=> onNodesSelectionsChange.Invoke());
     }
 
     void PlayModeChanged(PlayModeStateChange playModeState)
     {
-        mView.ClearGraph();
+        if (mView != null)
+            mView.ClearGraph();
     }
 
     private void OnCreateNodeButtonClick(GraphNodeType nodeType)
@@ -38,11 +45,18 @@ public class GraphWIndowController : IGraphWindowController
 
     public void LoadGraph(string fileName)
     {
-        mView.LoadGraphData(JsonService.ReadJsonFile<GraphData>(FILE_PATH + fileName));
+        if (mView != null)
+            mView.LoadGraphData(JsonService.ReadJsonFile<GraphData>(FILE_PATH + fileName));
     }
 
     public void SaveGraph(string fileName)
     {
-        JsonService.WriteJsonFile(mView.GetGraphData(), FILE_PATH + fileName);
+        if (mView != null)
+            JsonService.WriteJsonFile(mView.GetGraphData(), FILE_PATH + fileName);
+    }
+
+    public void RegisterToNodeSelectionsChange(UnityAction action)
+    {
+        onNodesSelectionsChange.AddListener(action);
     }
 }

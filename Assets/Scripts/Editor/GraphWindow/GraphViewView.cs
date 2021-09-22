@@ -6,6 +6,7 @@ using UnityEngine;
 using Unity.EditorCoroutines.Editor;
 using UnityEngine.UIElements;
 using System.Collections;
+using UnityEngine.Events;
 
 /// <summary>
 /// Responsebility: View of the graph; Create and remove nodes
@@ -15,6 +16,7 @@ public class GraphViewView : GraphView
     private readonly Vector2 nodeSize = new Vector2(150, 200);
     private int connectedCounter = 0;
 
+    private UnityEvent onSelectionNoedsChange = new UnityEvent();
     public GraphViewView()
     {
         //Add style
@@ -41,6 +43,11 @@ public class GraphViewView : GraphView
         graphViewChanged = GraphChanged;
     }
 
+    public void RegisterToOnNoedsSelectionChange(UnityAction unityAction)
+    {
+        onSelectionNoedsChange.AddListener(unityAction);
+    }
+
     private GraphViewChange GraphChanged(GraphViewChange graphViewChange)
     {
         EditorCoroutineUtility.StartCoroutine(UpdateNodesTitles(), this);
@@ -50,7 +57,7 @@ public class GraphViewView : GraphView
     private IEnumerator UpdateNodesTitles()
     {
         yield return null; //Changes are update in the end of the frame.
-        nodes.ForEach(x => x.title = ((NodeView)x).type == GraphNodeType.ENTRY_NODE ? "Entry Point" : "not connected (" + ((NodeView)x).type.ToString().ToLower().Replace('_', '-') + ")");
+        nodes.ForEach(x => x.title = ((NodeView)x).Type == GraphNodeType.ENTRY_NODE ? "Entry Point" : "not connected (" + ((NodeView)x).Type.ToString().ToLower().Replace('_', '-') + ")");
         connectedCounter = 0;
         NodeView firstNode = (NodeView)nodes.ToList()[0];
         MarkAsConnected(firstNode);
@@ -58,10 +65,10 @@ public class GraphViewView : GraphView
 
     private void MarkAsConnected(NodeView node)
     {
-        if (node.type != GraphNodeType.ENTRY_NODE)
+        if (node.Type != GraphNodeType.ENTRY_NODE)
         {
             connectedCounter++;
-            node.title = node.type == GraphNodeType.ENTRY_NODE ? "Start" : "connected  (" + node.type.ToString().ToLower().Replace('_', '-') + "),  N-" + connectedCounter;
+            node.title = node.Type == GraphNodeType.ENTRY_NODE ? "Start" : "connected  (" + node.Type.ToString().ToLower().Replace('_', '-') + "),  N-" + connectedCounter;
         }
 
         List<NodeView> connectedNode = new List<NodeView>();
@@ -82,8 +89,8 @@ public class GraphViewView : GraphView
             if (selectable.GetType() == typeof(NodeView))
             {
                 NodeView node = (NodeView)selectable;
-                if (node.type != GraphNodeType.ENTRY_NODE)
-                    toAddToSelection.Add(CreateNode(node.type, node.GetPosition().position - new Vector2(50, 50), node.GUID + "-Duplicate"));
+                if (node.Type != GraphNodeType.ENTRY_NODE)
+                    toAddToSelection.Add(CreateNode(node.Type, node.GetPosition().position - new Vector2(50, 50), node.GUID + "-Duplicate"));
             }
             toRemoveFromSelection.Add(selectable);
         }
@@ -93,7 +100,7 @@ public class GraphViewView : GraphView
             {
                 Edge edge = (Edge)selectable;
                 NodeView baseNode = (NodeView)edge.output.node;
-                if (baseNode.type == GraphNodeType.ENTRY_NODE)
+                if (baseNode.Type == GraphNodeType.ENTRY_NODE)
                     continue;
                 NodeView targetNode = (NodeView)edge.input.node;
                 if (selection.Contains(baseNode) && selection.Contains(targetNode))
@@ -125,11 +132,8 @@ public class GraphViewView : GraphView
 
     public NodeView CreateNode(GraphNodeType nodeType, Vector2 position, string guid = "")
     {
-        NodeView node = new NodeView
-        {
-            GUID = string.IsNullOrEmpty(guid) ? Guid.NewGuid().ToString() : guid,
-            type = nodeType
-        };
+        string GUID = string.IsNullOrEmpty(guid) ? Guid.NewGuid().ToString() : guid;
+        NodeView node = new NodeView(GUID, nodeType, new NodeExtraData());
 
         if (nodeType != GraphNodeType.ENTRY_NODE)
         {
@@ -141,6 +145,7 @@ public class GraphViewView : GraphView
         {
             node.capabilities &= ~Capabilities.Movable;
             node.capabilities &= ~Capabilities.Deletable;
+            node.capabilities &= ~Capabilities.Selectable;
         }
 
         Port outputPort = GeneratePort(node, Direction.Output);
@@ -161,12 +166,25 @@ public class GraphViewView : GraphView
 
         AddElement(node);
         EditorCoroutineUtility.StartCoroutine(UpdateNodesTitles(), this);
+        node.RegisterToOnSelectChange(OnSelectionNoedsChange);
         return node;
+    }
+
+    private void OnSelectionNoedsChange()
+    {
+        EditorCoroutineUtility.StartCoroutine(NotifySelectionNoedsChange(), this);
+    }
+
+    private IEnumerator NotifySelectionNoedsChange()
+    {
+        //selections is update inly in the end of the frame
+        yield return null;
+        onSelectionNoedsChange.Invoke();
     }
 
     private void AddStyle(NodeView node)
     {
-        switch (node.type)
+        switch (node.Type)
         {
             case GraphNodeType.ENTRY_NODE:
                 node.styleSheets.Add(Resources.Load<StyleSheet>("EntryNode"));
@@ -195,21 +213,21 @@ public class GraphViewView : GraphView
                         startPort != port && startPort.node != port.node)
             {
                 //Exclusive node connection option //TODO by config
-                switch (((NodeView)startPort.node).type)
+                switch (((NodeView)startPort.node).Type)
                 {
                     case GraphNodeType.ENTRY_NODE:
                         compatiblePorts.Add(port);
                         break;
                     case GraphNodeType.TYPE_1:
-                        if(((NodeView)port.node).type == GraphNodeType.TYPE_2)
+                        if(((NodeView)port.node).Type == GraphNodeType.TYPE_2)
                             compatiblePorts.Add(port);
                         break;
                     case GraphNodeType.TYPE_2:
-                        if (((NodeView)port.node).type == GraphNodeType.TYPE_3)
+                        if (((NodeView)port.node).Type == GraphNodeType.TYPE_3)
                             compatiblePorts.Add(port);
                         break;
                     case GraphNodeType.TYPE_3:
-                        if (((NodeView)port.node).type == GraphNodeType.TYPE_1)
+                        if (((NodeView)port.node).Type == GraphNodeType.TYPE_1)
                             compatiblePorts.Add(port);
                         break;
                     default:
@@ -225,7 +243,7 @@ public class GraphViewView : GraphView
     {
         foreach (NodeView node in nodes.ToList().Cast<NodeView>().ToList())
         {
-            if (node.type != GraphNodeType.ENTRY_NODE)
+            if (node.Type != GraphNodeType.ENTRY_NODE)
             {
                 edges.ToList().Where(x => x.input.node == node).ToList()
                     .ForEach(edge => RemoveElement(edge));

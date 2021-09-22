@@ -1,4 +1,5 @@
 ﻿using UnityEditor;
+using UnityEngine.Events;
 using UnityEngine.UIElements;
 
 public class GraphInspectorWindowView : EditorWindow, IGraphInspectorWindowView
@@ -6,6 +7,8 @@ public class GraphInspectorWindowView : EditorWindow, IGraphInspectorWindowView
     private IGraphInspectorWindowController mWindowController;
 
     private GraphInspectorView view;
+
+    private UnityEvent onExtraDataChange = new UnityEvent();
 
     public void OnEnable()
     {
@@ -26,18 +29,20 @@ public class GraphInspectorWindowView : EditorWindow, IGraphInspectorWindowView
         view.StretchToParentSize();
         rootVisualElement.Add(view);
     }
-
-    public void SaveOrLoadClicked(string fileName, bool save)
+    
+    public void ShowExtraDataFields(NodeExtraData extraData)
     {
-        if (string.IsNullOrEmpty(fileName))
-        {
-            EditorUtility.DisplayDialog("Invalid file name!", "Please enter a valid file name", "ok");
-            return;
-        }
-        if (save)
-            mWindowController.SaveClicked(fileName);
-        else
-            mWindowController.LoadClicked(fileName);
+        view.ShowExtraDataFileds(extraData);
+    }
+
+    public void HideExtraDataFields()
+    {
+        view.HideExtraDataFileds();
+    }
+
+    public void RegisterToOnExtraDataFieldsChange(UnityAction action)
+    {
+        onExtraDataChange.AddListener(action);
     }
 
     private void SaveClicked()

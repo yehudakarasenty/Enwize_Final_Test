@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
@@ -17,6 +18,8 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
 
     private CreateNodeButtonClickEvent createNodeButtonClickEvent = new CreateNodeButtonClickEvent();
 
+    private UnityEvent onSelectionChange = new UnityEvent();
+
     [MenuItem("Graph/Graph Window")]
     public static void Open() 
     {
@@ -27,6 +30,12 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
     {
         mController = SingleManager.Get<IGraphWindowController>();
         mController.SetView(this);
+        graph.RegisterToOnNoedsSelectionChange(OnNoedsSelectionChange);
+    }
+
+    private void OnNoedsSelectionChange()
+    {
+        onSelectionChange.Invoke();
     }
 
     public void ConsturctGraph()
@@ -79,7 +88,7 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
             {
                 GUID = node.GUID,
                 Position = node.GetPosition().position,
-                type = node.type
+                type = node.Type
             });
         }
         foreach (Edge edge in graph.edges.ToList())
@@ -119,6 +128,32 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
     public void RegisterToOnCreateNodeClickEvent(UnityAction<GraphNodeType> action) 
     {
         createNodeButtonClickEvent.AddListener(action);
+    }
+
+    public void RegisterToOnNodesSelectionChange(UnityAction action)
+    {
+        onSelectionChange.AddListener(action);
+    }
+
+    public List<GraphNodeData> GetNodesSelectionList()
+    {
+        List<GraphNodeData> nodesSelection = new List<GraphNodeData>();
+        foreach (ISelectable selectable in graph.selection)
+        {
+            if (selectable.GetType() == typeof(NodeView))
+            {
+                NodeView node = (NodeView)selectable;
+                if (node.Type!=GraphNodeType.ENTRY_NODE)
+                    nodesSelection.Add(new GraphNodeData()
+                    {
+                        extraData = node.NodeExtraData,
+                        GUID = node.GUID,
+                        Position = node.GetPosition().position,
+                        type = node.Type
+                    });
+            }
+        }
+        return nodesSelection;
     }
 
     public void OnDisable()
