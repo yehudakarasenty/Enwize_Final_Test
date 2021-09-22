@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityEditor;
+using UnityEngine;
 using UnityEngine.Events;
 
 public class GraphWIndowController : IGraphWindowController
@@ -7,9 +8,12 @@ public class GraphWIndowController : IGraphWindowController
 
     private IGraphWindowView mView;
 
+    private GraphData editModeGraph = new GraphData();
+
     public GraphWIndowController()
     {
         SingleManager.Register<IGraphWindowController>(this);
+        //EditorApplication.playModeStateChanged += ModeChanged; //TODO
     }
 
     public void InitDependencies()
@@ -22,6 +26,15 @@ public class GraphWIndowController : IGraphWindowController
         mView = view;
         mView.ConsturctGraph();
         mView.RegisterToOnCreateNodeClickEvent(new UnityAction<GraphNodeType>(OnCreateNodeButtonClick));
+    }
+
+    void ModeChanged(PlayModeStateChange playModeState)
+    {
+        //TODO
+        //if (playModeState == PlayModeStateChange.EnteredEditMode)
+        //    mView.LoadGraphData(editModeGraph);
+        //else if(playModeState == PlayModeStateChange.ExitingEditMode)
+        //    editModeGraph = mView.GetGraphData();
     }
 
     private void OnCreateNodeButtonClick(GraphNodeType nodeType)
