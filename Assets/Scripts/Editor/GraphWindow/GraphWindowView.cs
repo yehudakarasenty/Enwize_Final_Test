@@ -170,7 +170,7 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
     public void OnDisable()
     {
         rootVisualElement.Remove(graph);
-        GetWindow<GraphInspectorWindowView>().Close(); //TODO Myabe by controller interface
+        GetWindow<GraphInspectorWindowView>().Close();
     }
 }
 

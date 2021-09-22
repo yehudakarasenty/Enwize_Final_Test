@@ -27,7 +27,7 @@ public static class JsonService
 
             if (!Directory.Exists(parentDir.FullName))
                 Directory.CreateDirectory(parentDir.FullName);
-            if (File.Exists(filePath)) //TODO delete? maybe to notify
+            if (File.Exists(filePath))
                 File.Delete(filePath);
             string json = ObjectToJson(obj, ignoreNulls, true);
             StreamWriter writer = new StreamWriter(filePath, true);
