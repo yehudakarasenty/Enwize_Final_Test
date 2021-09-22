@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 
 // NODE_3 type have two output ports
-public enum GraphNodeType { ENTRY_NODE, NODE_1, NODE_2, NODE_3 }
+public enum GraphNodeType { ENTRY_NODE, TYPE_1, TYPE_2, TYPE_3 }
 
 public class GraphNodeData
 {

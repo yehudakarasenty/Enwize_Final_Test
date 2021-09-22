@@ -49,15 +49,15 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
         inspectorWindowOpenButton.text = "Open Inspector Window";
         toolbar.Add(inspectorWindowOpenButton);
 
-        Button nodeCreateButton1 = new Button(() => createNodeButtonClickEvent.Invoke(GraphNodeType.NODE_1));
+        Button nodeCreateButton1 = new Button(() => createNodeButtonClickEvent.Invoke(GraphNodeType.TYPE_1));
         nodeCreateButton1.text = "Create Node Type 1";
         toolbar.Add(nodeCreateButton1);
 
-        Button nodeCreateButton2 = new Button(() => createNodeButtonClickEvent.Invoke(GraphNodeType.NODE_2));
+        Button nodeCreateButton2 = new Button(() => createNodeButtonClickEvent.Invoke(GraphNodeType.TYPE_2));
         nodeCreateButton2.text = "Create Node Type 2";
         toolbar.Add(nodeCreateButton2);
 
-        Button nodeCreateButton3 = new Button(() => createNodeButtonClickEvent.Invoke(GraphNodeType.NODE_3));
+        Button nodeCreateButton3 = new Button(() => createNodeButtonClickEvent.Invoke(GraphNodeType.TYPE_3));
         nodeCreateButton3.text = "Create Node Type 3";
         toolbar.Add(nodeCreateButton3);
 

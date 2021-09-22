@@ -89,7 +89,7 @@ public class GraphViewView : GraphView
     {
         NodeView node = new NodeView
         {
-            title = nodeType.ToString(), //TODO need to be automatic
+            title = nodeType == GraphNodeType.ENTRY_NODE? "Start" : "not connected  (" + nodeType.ToString().ToLower().Replace('_','-') +")", //TODO need to be automatic
             GUID = string.IsNullOrEmpty(guid) ? Guid.NewGuid().ToString() : guid,
             type = nodeType
         };
@@ -110,7 +110,7 @@ public class GraphViewView : GraphView
         outputPort.portName = "Output-0";
         node.outputContainer.Add(outputPort);
 
-        if(nodeType == GraphNodeType.NODE_3)
+        if(nodeType == GraphNodeType.TYPE_3)
         {
             Port secondOutputPort = GeneratePort(node, Direction.Output);
             secondOutputPort.portName = "Output-1";
@@ -120,10 +120,32 @@ public class GraphViewView : GraphView
         node.RefreshExpandedState();
         node.RefreshPorts();
         node.SetPosition(new Rect(position, nodeSize));
-        node.styleSheets.Add(Resources.Load<StyleSheet>("Node"));
+        AddStyle(node);
+
         AddElement(node);
 
         return node;
+    }
+
+    private void AddStyle(NodeView node)
+    {
+        switch (node.type)
+        {
+            case GraphNodeType.ENTRY_NODE:
+                node.styleSheets.Add(Resources.Load<StyleSheet>("EntryNode"));
+                break;
+            case GraphNodeType.TYPE_1:
+                node.styleSheets.Add(Resources.Load<StyleSheet>("NodeType1"));
+                break;
+            case GraphNodeType.TYPE_2:
+                node.styleSheets.Add(Resources.Load<StyleSheet>("NodeType2"));
+                break;
+            case GraphNodeType.TYPE_3:
+                node.styleSheets.Add(Resources.Load<StyleSheet>("NodeType3"));
+                break;
+            default:
+                break;
+        }
     }
 
     public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
@@ -141,16 +163,16 @@ public class GraphViewView : GraphView
                     case GraphNodeType.ENTRY_NODE:
                         compatiblePorts.Add(port);
                         break;
-                    case GraphNodeType.NODE_1:
-                        if(((NodeView)port.node).type == GraphNodeType.NODE_2)
+                    case GraphNodeType.TYPE_1:
+                        if(((NodeView)port.node).type == GraphNodeType.TYPE_2)
                             compatiblePorts.Add(port);
                         break;
-                    case GraphNodeType.NODE_2:
-                        if (((NodeView)port.node).type == GraphNodeType.NODE_3)
+                    case GraphNodeType.TYPE_2:
+                        if (((NodeView)port.node).type == GraphNodeType.TYPE_3)
                             compatiblePorts.Add(port);
                         break;
-                    case GraphNodeType.NODE_3:
-                        if (((NodeView)port.node).type == GraphNodeType.NODE_1)
+                    case GraphNodeType.TYPE_3:
+                        if (((NodeView)port.node).type == GraphNodeType.TYPE_1)
                             compatiblePorts.Add(port);
                         break;
                     default:
