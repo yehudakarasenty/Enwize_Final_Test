@@ -1,35 +1,51 @@
-﻿using UnityEngine.UIElements;
+﻿using UnityEngine.Events;
+using UnityEngine.UIElements;
 
 public class GraphInspectorView : VisualElement
 {
-    private IExtraEditorWindow mWindow;
+    public string FileName { get; private set; } = "new narrative";
 
-    private string fileName = "new narrative";
+    private UnityEvent OnSaveClick = new UnityEvent();
+    private UnityEvent OnLoadClick = new UnityEvent();
 
-    public GraphInspectorView(IExtraEditorWindow window)
+    public GraphInspectorView()
     {
-        mWindow = window;
         CreateButtons();
     }
 
     private void CreateButtons()
     {
-        Button saveButtons = new Button(()=> SaveOrLoadClicked(true)) { text = "Save Graph" };
+        Button saveButtons = new Button(()=> OnSaveClick.Invoke()) { text = "Save Graph" };
         Add(saveButtons);
 
-        Button loadButtons = new Button(() => SaveOrLoadClicked(false)) {text = "Load Graph" };
+        Button loadButtons = new Button(() => OnLoadClick.Invoke()) {text = "Load Graph" };
         Add(loadButtons);
 
         TextField fileNameTestField = new TextField("File Name");
-        fileNameTestField.SetValueWithoutNotify(fileName);
+        fileNameTestField.SetValueWithoutNotify(FileName);
         fileNameTestField.MarkDirtyRepaint();
-        fileNameTestField.RegisterValueChangedCallback(evt => fileName = evt.newValue);
+        fileNameTestField.RegisterValueChangedCallback(evt => FileName = evt.newValue);
 
         Add(fileNameTestField);
     }
 
-    private void SaveOrLoadClicked(bool save)
+    public void RegisterToOnSaveClick(UnityAction action)
     {
-        mWindow.SaveOrLoadClicked(fileName, save);
+        OnSaveClick.AddListener(action);
+    }
+
+    public void RemoveFromOnSaveClick(UnityAction action)
+    {
+        OnSaveClick.RemoveListener(action);
+    }
+
+    public void RegisterToOnLoadClick(UnityAction action)
+    {
+        OnLoadClick.AddListener(action);
+    }
+
+    public void RemoveFromOnLoadClick(UnityAction action)
+    {
+        OnLoadClick.RemoveListener(action);
     }
 }

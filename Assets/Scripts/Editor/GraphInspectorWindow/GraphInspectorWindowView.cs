@@ -1,37 +1,30 @@
 ﻿using UnityEditor;
 using UnityEngine.UIElements;
 
-public class GraphInspectorWindowView : EditorWindow, IExtraEditorWindow
+public class GraphInspectorWindowView : EditorWindow, IGraphInspectorWindowView
 {
-    private IGraphWindow mGraphWindow;
+    private IGraphInspectorWindowController mWindowController;
 
     private GraphInspectorView view;
 
-    private void Awake()
+    public void OnEnable()
     {
-        SingleManager.Register<IExtraEditorWindow>(this);
+        mWindowController = SingleManager.Get<IGraphInspectorWindowController>();
+        mWindowController.SetView(this);
     }
 
-    private void OnEnable()
+    public void ConsturctView()
     {
-        mGraphWindow = SingleManager.Get<IGraphWindow>();
-        ConsturctView();
-    }
-
-    private void ConsturctView()
-    {
-        view = new GraphInspectorView(this)
+        view = new GraphInspectorView()
         {
             name = "ExtraEditorWindow"
         };
 
+        view.RegisterToOnLoadClick(LoadClicked);
+        view.RegisterToOnSaveClick(SaveClicked);
+
         view.StretchToParentSize();
         rootVisualElement.Add(view);
-    }
-
-    private void OnDisable()
-    {
-        rootVisualElement.Remove(view);
     }
 
     public void SaveOrLoadClicked(string fileName, bool save)
@@ -41,14 +34,41 @@ public class GraphInspectorWindowView : EditorWindow, IExtraEditorWindow
             EditorUtility.DisplayDialog("Invalid file name!", "Please enter a valid file name", "ok");
             return;
         }
-        if(save) 
-            mGraphWindow.SaveGraph(fileName);
-        else 
-            mGraphWindow.LoadGraph(fileName);
+        if (save)
+            mWindowController.SaveClicked(fileName);
+        else
+            mWindowController.LoadClicked(fileName);
     }
 
-    private void OnDestroy()
+    private void SaveClicked()
     {
-        SingleManager.Remove<IExtraEditorWindow>();
+        if (string.IsNullOrEmpty(view.FileName))
+        {
+            EditorUtility.DisplayDialog("Invalid file name!", "Please enter a valid file name", "ok");
+            return;
+        }
+        mWindowController.SaveClicked(view.FileName);
+    }
+
+    private void LoadClicked()
+    {
+        if (string.IsNullOrEmpty(view.FileName))
+        {
+            EditorUtility.DisplayDialog("Invalid file name!", "Please enter a valid file name", "ok");
+            return;
+        }
+        mWindowController.LoadClicked(view.FileName);
+    }
+
+    public void UpdateView()
+    {
+        //TODO
+    }
+
+    public void OnDisable()
+    {
+        view.RemoveFromOnLoadClick(LoadClicked);
+        view.RemoveFromOnSaveClick(SaveClicked);
+        rootVisualElement.Remove(view);
     }
 }

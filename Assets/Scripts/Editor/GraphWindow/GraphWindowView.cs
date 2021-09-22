@@ -8,16 +8,11 @@ using UnityEngine.UIElements;
 /// <summary>
 /// Responsebility: Open and close graph window and comunicate with dependecies + save and load graph data
 /// </summary>
-public class GraphWindowView : EditorWindow, IGraphWindow
+public class GraphWindowView : EditorWindow, IGraphWindowView
 {
-    private const string FILE_PATH = "C:/Users/yehud/Desktop/JsonsFiles/"; //TODO: to config
+    private IGraphWindowController mController;
 
     private GraphViewView graph;
-
-    private void Awake()
-    {
-        SingleManager.Register<IGraphWindow>(this);
-    }
 
     [MenuItem("Graph/Graph Window")]
     public static void Open() 
@@ -25,13 +20,13 @@ public class GraphWindowView : EditorWindow, IGraphWindow
         GetWindow<GraphWindowView>().titleContent = new GUIContent("Graph");
     }
 
-    private void OnEnable()
+    public void OnEnable()
     {
-        ConsturctGraph();
-        GenerateToolbar();
+        mController = SingleManager.Get<IGraphWindowController>();
+        mController.SetView(this);
     }
 
-    private void ConsturctGraph()
+    public void ConsturctGraph()
     {
         graph = new GraphViewView
         {
@@ -40,6 +35,7 @@ public class GraphWindowView : EditorWindow, IGraphWindow
 
         graph.StretchToParentSize();
         rootVisualElement.Add(graph);
+        GenerateToolbar();
     }
 
     private void GenerateToolbar()
@@ -66,7 +62,7 @@ public class GraphWindowView : EditorWindow, IGraphWindow
         rootVisualElement.Add(toolbar);
     }
 
-    public void SaveGraph(string fileName)
+    public GraphData GetGraphData()
     {
         GraphData graphData = new GraphData();
         foreach(NodeView node in graph.nodes.ToList().Cast<NodeView>().ToList())
@@ -87,16 +83,12 @@ public class GraphWindowView : EditorWindow, IGraphWindow
                 portName = edgd.output.portName
             });
         }
-
-        JsonService.WriteJsonFile(graphData, FILE_PATH + fileName);
+        return graphData;
     }
 
-    public void LoadGraph(string fileName)
+    public void LoadGraphData(GraphData graphData)
     {
-        graph.ClearGraph();
-
-        GraphData graphData = JsonService.ReadJsonFile<GraphData>(FILE_PATH + fileName);
-
+        ClearGraph();
         foreach (GraphNodeData nodeData in graphData.nodes)
         {
             graph.CreateNode(nodeData.type, nodeData.Position, nodeData.GUID);
@@ -111,6 +103,11 @@ public class GraphWindowView : EditorWindow, IGraphWindow
         }
     }
 
+    public void ClearGraph()
+    {
+        graph.ClearGraph();
+    }
+
     private void LinkNodesTogether(Port outputSocket, Port inputSocket)
     {
         Edge tempEdge = new Edge()
@@ -123,14 +120,9 @@ public class GraphWindowView : EditorWindow, IGraphWindow
         graph.Add(tempEdge);
     }
 
-    private void OnDisable()
+    public void OnDisable()
     {
         rootVisualElement.Remove(graph);
-        GetWindow<GraphInspectorWindowView>().Close();
-    }
-
-    private void OnDestroy()
-    {
-        SingleManager.Remove<IGraphWindow>();
+        GetWindow<GraphInspectorWindowView>().Close(); //TODO Myabe by controller interface
     }
 }
