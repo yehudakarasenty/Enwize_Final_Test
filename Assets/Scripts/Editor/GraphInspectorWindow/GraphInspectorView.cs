@@ -31,16 +31,16 @@ public class GraphInspectorView : VisualElement
 
         TextField fileNameTestField = new TextField("File Name");
         fileNameTestField.SetValueWithoutNotify(FileName);
-        fileNameTestField.MarkDirtyRepaint();//TO Understand
+        fileNameTestField.MarkDirtyRepaint();//Triggers a repaint of the VisualElement on the next frame.
         fileNameTestField.RegisterValueChangedCallback(evt => FileName = evt.newValue);
 
         Add(fileNameTestField);
 
         specialNumberTextField = new TextField("My Special Number");
-        specialNumberTextField.MarkDirtyRepaint();//TO Understand
+        specialNumberTextField.MarkDirtyRepaint();//Triggers a repaint of the VisualElement on the next frame.
 
         specialSecretTextField = new TextField("My Special Secret");
-        specialSecretTextField.MarkDirtyRepaint();//TO Understand
+        specialSecretTextField.MarkDirtyRepaint();//Triggers a repaint of the VisualElement on the next frame.
 
         specialNumberTextField.RegisterValueChangedCallback(evt => OnAdditionalDataChange());
         specialSecretTextField.RegisterValueChangedCallback(evt => OnAdditionalDataChange());
