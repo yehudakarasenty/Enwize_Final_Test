@@ -70,6 +70,10 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
         nodeCreateButton3.text = "Create Node Type 3";
         toolbar.Add(nodeCreateButton3);
 
+        Button DeleteAllButton = new Button(() => { ClearGraph(); });
+        DeleteAllButton.text = "Delete all";
+        toolbar.Add(DeleteAllButton);
+
         //Add the toolbar to the editor window
         rootVisualElement.Add(toolbar);
     }
