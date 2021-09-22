@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 public class GraphWIndowController : IGraphWindowController
 {
-    private const string FILE_PATH = "C:/Users/yehud/Desktop/JsonsFiles/"; //TODO: to config
+    private string filePath;
 
     private IGraphWindowView mView;
     private IGraphInspectorWindowController mGraphInspectorWindowController;
@@ -24,6 +24,7 @@ public class GraphWIndowController : IGraphWindowController
     {
         mGraphInspectorWindowController = SingleManager.Get<IGraphInspectorWindowController>();
         mGraphInspectorWindowController.RegisterToOnAdditionalDataFieldsChange(OnAdditionalDataInspectorChange);
+        filePath = ConfigUtility.Configuration.SaveLoadPath;
     }
 
     private void OnAdditionalDataInspectorChange()
@@ -54,13 +55,13 @@ public class GraphWIndowController : IGraphWindowController
     public void LoadGraph(string fileName)
     {
         if (mView != null)
-            mView.LoadGraphData(JsonService.ReadJsonFile<GraphData>(FILE_PATH + fileName));
+            mView.LoadGraphData(JsonService.ReadJsonFile<GraphData>(filePath + fileName));
     }
 
     public void SaveGraph(string fileName)
     {
         if (mView != null)
-            JsonService.WriteJsonFile(mView.GetGraphData(), FILE_PATH + fileName);
+            JsonService.WriteJsonFile(mView.GetGraphData(), filePath + fileName);
     }
 
     public void RegisterToNodeSelectionsChange(UnityAction action)

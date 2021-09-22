@@ -212,7 +212,7 @@ public class GraphViewView : GraphView
                     !(port.portName.StartsWith("Output") && startPort.portName.StartsWith("Output")) &&
                         startPort != port && startPort.node != port.node)
             {
-                //Exclusive node connection option //TODO by config
+                //Exclusive node connection option
                 switch (((NodeView)startPort.node).Type)
                 {
                     case GraphNodeType.ENTRY_NODE:
