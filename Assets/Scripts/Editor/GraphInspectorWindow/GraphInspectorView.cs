@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 public class GraphInspectorView : VisualElement
 {
-    public string FileName { get; private set; } = "new narrative";
+    public string FileName { get; private set; } = "name";
 
     private UnityEvent onSaveClick = new UnityEvent();
     private UnityEvent onLoadClick = new UnityEvent();
@@ -23,18 +23,21 @@ public class GraphInspectorView : VisualElement
 
     private void CreateElements()
     {
+        TextField fileNameTestField = new TextField("File Name");
+        fileNameTestField.SetValueWithoutNotify(FileName);
+        fileNameTestField.MarkDirtyRepaint();//Triggers a repaint of the VisualElement on the next frame.
+        fileNameTestField.RegisterValueChangedCallback(evt => FileName = evt.newValue);
+        Add(fileNameTestField);
+
         Button saveButtons = new Button(()=> onSaveClick.Invoke()) { text = "Save Graph" };
         Add(saveButtons);
 
         Button loadButtons = new Button(() => onLoadClick.Invoke()) {text = "Load Graph" };
         Add(loadButtons);
 
-        TextField fileNameTestField = new TextField("File Name");
-        fileNameTestField.SetValueWithoutNotify(FileName);
-        fileNameTestField.MarkDirtyRepaint();//Triggers a repaint of the VisualElement on the next frame.
-        fileNameTestField.RegisterValueChangedCallback(evt => FileName = evt.newValue);
-
-        Add(fileNameTestField);
+        Add(new Label(" "));
+        Add(new Label(" "));
+        Add(new Label("Additional Data:"));
 
         specialNumberTextField = new TextField("My Special Number");
         specialNumberTextField.MarkDirtyRepaint();//Triggers a repaint of the VisualElement on the next frame.
