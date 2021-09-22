@@ -3,10 +3,17 @@ using UnityEngine.Events;
 
 public class NodeView : Node
 {
+    #region Members
     public string GUID;
+
     public GraphNodeType Type;
+
     public NodeAdditionalData NodeAdditionalData;
-    private UnityEvent OnSelecteChange = new UnityEvent();
+
+    private UnityEvent onSelecteChange = new UnityEvent();
+    #endregion
+
+    #region Functions
     public NodeView(string gUID, GraphNodeType type, NodeAdditionalData nodeAdditionalData)
     {
         GUID = gUID;
@@ -17,17 +24,18 @@ public class NodeView : Node
     public override void OnSelected()
     {
         base.OnSelected();
-        OnSelecteChange.Invoke();
+        onSelecteChange.Invoke();
     }
 
     public override void OnUnselected()
     {
         base.OnUnselected();
-        OnSelecteChange.Invoke();
+        onSelecteChange.Invoke();
     }
 
     public void RegisterToOnSelectChange(UnityAction action)
     {
-        OnSelecteChange.AddListener(action);
+        onSelecteChange.AddListener(action);
     }
+    #endregion
 }

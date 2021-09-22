@@ -3,21 +3,31 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class GraphWIndowController : IGraphWindowController
+/// <summary>
+/// Responsibility: Control GraphWindow Window and comunicate with dependencies
+/// </summary>
+public class GraphWindowController : IGraphWindowController
 {
+    #region Members
+    #region Dependecis
+    private IGraphInspectorWindowController mGraphInspectorWindowController;
+    #endregion
+
     private string filePath;
 
     private IGraphWindowView mView;
-    private IGraphInspectorWindowController mGraphInspectorWindowController;
 
     public List<GraphNodeData> NodesSelections => mView.GetNodesSelectionList();
 
     private UnityEvent onNodesSelectionsChange = new UnityEvent();
+    #endregion
 
-    public GraphWIndowController()
+    #region Functions
+    #region Init
+    public GraphWindowController()
     {
         SingleManager.Register<IGraphWindowController>(this);
-        EditorApplication.playModeStateChanged += PlayModeChanged; 
+        EditorApplication.playModeStateChanged += PlayModeChanged;
     }
 
     public void InitDependencies()
@@ -27,18 +37,20 @@ public class GraphWIndowController : IGraphWindowController
         filePath = ConfigUtility.Configuration.SaveLoadPath;
     }
 
-    private void OnAdditionalDataInspectorChange()
-    {
-        NodeAdditionalData nodeAdditionalData = mGraphInspectorWindowController.NodeAdditionalDataFields();
-        mView.InjectAdditionalDataToSelectionNodes(nodeAdditionalData);
-    }
-
     public void SetView(IGraphWindowView view)
     {
         mView = view;
         mView.ConsturctGraph();
         mView.RegisterToOnCreateNodeClickEvent(new UnityAction<GraphNodeType>(OnCreateNodeButtonClick));
-        mView.RegisterToOnNodesSelectionChange(()=> onNodesSelectionsChange.Invoke());
+        mView.RegisterToOnNodesSelectionChange(() => onNodesSelectionsChange.Invoke());
+    }
+    #endregion
+
+    #region Handle Events
+    private void OnAdditionalDataInspectorChange()
+    {
+        NodeAdditionalData nodeAdditionalData = mGraphInspectorWindowController.NodeAdditionalDataFields();
+        mView.InjectAdditionalDataToSelectionNodes(nodeAdditionalData);
     }
 
     void PlayModeChanged(PlayModeStateChange playModeState)
@@ -47,11 +59,10 @@ public class GraphWIndowController : IGraphWindowController
             mView.ClearGraph();
     }
 
-    private void OnCreateNodeButtonClick(GraphNodeType nodeType)
-    {
-        mView.CreateNode(nodeType, Vector2.zero, new NodeAdditionalData());
-    }
+    private void OnCreateNodeButtonClick(GraphNodeType nodeType) => mView.CreateNode(nodeType, Vector2.zero, new NodeAdditionalData());
+    #endregion
 
+    #region Actions
     public void LoadGraph(string fileName)
     {
         if (mView != null)
@@ -66,8 +77,7 @@ public class GraphWIndowController : IGraphWindowController
         Debug.Log("Graph Saved");
     }
 
-    public void RegisterToNodeSelectionsChange(UnityAction action)
-    {
-        onNodesSelectionsChange.AddListener(action);
-    }
+    public void RegisterToNodeSelectionsChange(UnityAction action) => onNodesSelectionsChange.AddListener(action);
+    #endregion
+    #endregion
 }

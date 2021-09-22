@@ -25,14 +25,6 @@ public static class SingleManager
         singletons.Add(typeof(T), instance);
     }
 
-    public static void Remove<T>() where T : class
-    {
-        if (singletons.ContainsKey(typeof(T)))
-            singletons.Remove(typeof(T));
-        else
-            Debug.LogError("You tery to remove unexist class: "+ typeof(T));
-    }
-
     public static T Get<T>() where T : class
     {
         if (!singletons.ContainsKey(typeof(T)))

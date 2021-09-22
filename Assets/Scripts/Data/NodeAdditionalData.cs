@@ -6,9 +6,7 @@ public class NodeAdditionalData
     [JsonProperty("mySpecialSecret ")]
     public string mySpecialSecret;
 
-    public NodeAdditionalData()
-    {
-    }
+    public NodeAdditionalData(){}
 
     public NodeAdditionalData(NodeAdditionalData copy)
     {

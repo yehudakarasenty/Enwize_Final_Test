@@ -4,10 +4,14 @@ using UnityEngine.UIElements;
 
 public class GraphInspectorWindowView : EditorWindow, IGraphInspectorWindowView
 {
+    #region Members
     private IGraphInspectorWindowController mWindowController;
 
-    private GraphInspectorView view;
+    private GraphInspectorElementsView view;
+    #endregion
 
+    #region Functions
+    #region Init
     public void OnEnable()
     {
         mWindowController = SingleManager.Get<IGraphInspectorWindowController>();
@@ -16,7 +20,7 @@ public class GraphInspectorWindowView : EditorWindow, IGraphInspectorWindowView
 
     public void ConsturctView()
     {
-        view = new GraphInspectorView()
+        view = new GraphInspectorElementsView()
         {
             name = "AdditionalEditorWindow"
         };
@@ -27,7 +31,16 @@ public class GraphInspectorWindowView : EditorWindow, IGraphInspectorWindowView
         view.StretchToParentSize();
         rootVisualElement.Add(view);
     }
+    #endregion
 
+    #region GetData
+    public NodeAdditionalData GetNodeAdditionalDataFields()
+    {
+        return new NodeAdditionalData(int.Parse(view.SpecialNumberText), view.SpecialSecretText);
+    }
+    #endregion
+
+    #region Actions
     public void ShowAdditionalDataFields(NodeAdditionalData additionalData)
     {
         view.ShowAdditionalDataFileds(additionalData);
@@ -42,7 +55,9 @@ public class GraphInspectorWindowView : EditorWindow, IGraphInspectorWindowView
     {
         view.RegisterToOnAdditionalDataChange(action);
     }
+    #endregion
 
+    #region Handle Events
     private void SaveClicked()
     {
         if (string.IsNullOrEmpty(view.FileName))
@@ -63,15 +78,12 @@ public class GraphInspectorWindowView : EditorWindow, IGraphInspectorWindowView
         mWindowController.LoadClicked(view.FileName);
     }
 
-    public NodeAdditionalData GetNodeAdditionalDataFields()
-    {
-        return new NodeAdditionalData(int.Parse(view.SpecialNumberText), view.SpecialSecretText);
-    }
-
     public void OnDisable()
     {
         view.RemoveFromOnLoadClick(LoadClicked);
         view.RemoveFromOnSaveClick(SaveClicked);
         rootVisualElement.Remove(view);
     }
+    #endregion
+    #endregion
 }

@@ -7,21 +7,23 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
 
-/// <summary>
-/// Responsebility: Open and close graph window and comunicate with dependecies + save and load graph data
-/// </summary>
 public class GraphWindowView : EditorWindow, IGraphWindowView
 {
+    #region Members
     private IGraphWindowController mController;
 
-    private GraphViewView graph;
+    private GraphViewElement graph;
 
     private CreateNodeButtonClickEvent createNodeButtonClickEvent = new CreateNodeButtonClickEvent();
 
     private UnityEvent onSelectionChange = new UnityEvent();
+    #endregion
 
+    #region Functions
+
+    #region Init
     [MenuItem("Graph/Graph Window")]
-    public static void Open() 
+    public static void Open()
     {
         GetWindow<GraphWindowView>().titleContent = new GUIContent("Graph");
     }
@@ -33,14 +35,9 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
         graph.RegisterToOnNoedsSelectionChange(OnNoedsSelectionChange);
     }
 
-    private void OnNoedsSelectionChange()
-    {
-        onSelectionChange.Invoke();
-    }
-
     public void ConsturctGraph()
     {
-        graph = new GraphViewView
+        graph = new GraphViewElement
         {
             name = "Graph"
         };
@@ -54,22 +51,27 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
     {
         Toolbar toolbar = new Toolbar();
 
+        //Open inspector button
         Button inspectorWindowOpenButton = new Button(() => { GetWindow<GraphInspectorWindowView>().titleContent = new GUIContent("Inspector Window"); });
         inspectorWindowOpenButton.text = "Open Inspector Window";
         toolbar.Add(inspectorWindowOpenButton);
 
+        //Create node 1 button
         Button nodeCreateButton1 = new Button(() => createNodeButtonClickEvent.Invoke(GraphNodeType.TYPE_1));
         nodeCreateButton1.text = "Create Node Type 1";
         toolbar.Add(nodeCreateButton1);
 
+        //Create node 2 button
         Button nodeCreateButton2 = new Button(() => createNodeButtonClickEvent.Invoke(GraphNodeType.TYPE_2));
         nodeCreateButton2.text = "Create Node Type 2";
         toolbar.Add(nodeCreateButton2);
 
+        //Create node 3 button
         Button nodeCreateButton3 = new Button(() => createNodeButtonClickEvent.Invoke(GraphNodeType.TYPE_3));
         nodeCreateButton3.text = "Create Node Type 3";
         toolbar.Add(nodeCreateButton3);
 
+        //Open delete all button
         Button DeleteAllButton = new Button(() => { ClearGraph(); });
         DeleteAllButton.text = "Delete all";
         toolbar.Add(DeleteAllButton);
@@ -77,16 +79,69 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
         //Add the toolbar to the editor window
         rootVisualElement.Add(toolbar);
     }
+    #endregion
 
+    #region Handle Events
+    private void OnNoedsSelectionChange() => onSelectionChange.Invoke();
+
+    public void OnDisable()
+    {
+        rootVisualElement.Remove(graph);
+        GetWindow<GraphInspectorWindowView>().Close();
+    }
+    #endregion
+
+    #region Actions
     public void CreateNode(GraphNodeType nodeType, Vector2 position, NodeAdditionalData additionalData)
     {
         graph.CreateNode(nodeType, position, additionalData);
     }
 
+    public void LoadGraphData(GraphData graphData)
+    {
+        ClearGraph();
+        foreach (GraphNodeData nodeData in graphData.nodes)
+            graph.CreateNode(nodeData.type, nodeData.Position, nodeData.additionalData, nodeData.GUID);
+
+        foreach (GraphNodeLinkData link in graphData.links)
+        {
+            Node baseNode = graph.nodes.ToList().First(x => ((NodeView)x).GUID == link.BaseNodeGuid);
+            Node targetNode = graph.nodes.ToList().First(x => ((NodeView)x).GUID == link.TargetNodeGuid);
+            int portIndex = int.Parse(link.portName.Substring(link.portName.IndexOf('-') + 1));
+            graph.LinkNodesTogether((Port)baseNode.outputContainer[portIndex], (Port)targetNode.inputContainer[0]);
+        }
+    }
+
+    public void ClearGraph() => graph.ClearGraph();
+
+    public void RegisterToOnCreateNodeClickEvent(UnityAction<GraphNodeType> action)
+    {
+        createNodeButtonClickEvent.AddListener(action);
+    }
+
+    public void RegisterToOnNodesSelectionChange(UnityAction action)
+    {
+        onSelectionChange.AddListener(action);
+    }
+
+    public void InjectAdditionalDataToSelectionNodes(NodeAdditionalData nodeAdditionalData)
+    {
+        foreach (ISelectable selectable in graph.selection)
+        {
+            if (selectable.GetType() == typeof(NodeView))
+            {
+                NodeView node = (NodeView)selectable;
+                node.NodeAdditionalData = new NodeAdditionalData(nodeAdditionalData);
+            }
+        }
+    }
+    #endregion
+
+    #region GetData
     public GraphData GetGraphData()
     {
         GraphData graphData = new GraphData();
-        foreach(NodeView node in graph.nodes.ToList().Cast<NodeView>().ToList())
+        foreach (NodeView node in graph.nodes.ToList().Cast<NodeView>().ToList())
         {
             graphData.nodes.Add(new GraphNodeData()
             {
@@ -108,36 +163,6 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
         return graphData;
     }
 
-    public void LoadGraphData(GraphData graphData)
-    {
-        ClearGraph();
-        foreach (GraphNodeData nodeData in graphData.nodes)
-            graph.CreateNode(nodeData.type, nodeData.Position, nodeData.additionalData, nodeData.GUID);
-
-        foreach (GraphNodeLinkData link in graphData.links)
-        {
-            Node baseNode = graph.nodes.ToList().First(x => ((NodeView)x).GUID == link.BaseNodeGuid);
-            Node targetNode = graph.nodes.ToList().First(x => ((NodeView)x).GUID == link.TargetNodeGuid);
-            int portIndex = int.Parse(link.portName.Substring(link.portName.IndexOf('-') + 1));
-            graph.LinkNodesTogether((Port)baseNode.outputContainer[portIndex], (Port)targetNode.inputContainer[0]);
-        }
-    }
-
-    public void ClearGraph()
-    {
-        graph.ClearGraph();
-    }
-
-    public void RegisterToOnCreateNodeClickEvent(UnityAction<GraphNodeType> action) 
-    {
-        createNodeButtonClickEvent.AddListener(action);
-    }
-
-    public void RegisterToOnNodesSelectionChange(UnityAction action)
-    {
-        onSelectionChange.AddListener(action);
-    }
-
     public List<GraphNodeData> GetNodesSelectionList()
     {
         List<GraphNodeData> nodesSelection = new List<GraphNodeData>();
@@ -146,7 +171,7 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
             if (selectable.GetType() == typeof(NodeView))
             {
                 NodeView node = (NodeView)selectable;
-                if (node.Type!=GraphNodeType.ENTRY_NODE)
+                if (node.Type != GraphNodeType.ENTRY_NODE)
                     nodesSelection.Add(new GraphNodeData()
                     {
                         additionalData = node.NodeAdditionalData,
@@ -158,24 +183,8 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
         }
         return nodesSelection;
     }
-
-    public void InjectAdditionalDataToSelectionNodes(NodeAdditionalData nodeAdditionalData)
-    {
-        foreach (ISelectable selectable in graph.selection)
-        {
-            if (selectable.GetType() == typeof(NodeView))
-            {
-                NodeView node = (NodeView)selectable;
-                node.NodeAdditionalData = new NodeAdditionalData(nodeAdditionalData);
-            }
-        }
-    }
-
-    public void OnDisable()
-    {
-        rootVisualElement.Remove(graph);
-        GetWindow<GraphInspectorWindowView>().Close();
-    }
+    #endregion
+    #endregion
 }
 
 public class CreateNodeButtonClickEvent : UnityEvent<GraphNodeType> { }

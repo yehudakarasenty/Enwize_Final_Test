@@ -2,57 +2,74 @@
 using UnityEngine.Events;
 using UnityEngine.UIElements;
 
-public class GraphInspectorView : VisualElement
+public class GraphInspectorElementsView : VisualElement
 {
-    public string FileName { get; private set; } = "name";
-
+    #region Members
+    #region Events 
     private UnityEvent onSaveClick = new UnityEvent();
     private UnityEvent onLoadClick = new UnityEvent();
     private UnityEvent onAdditionalDataChange = new UnityEvent();
+    #endregion
 
+    #region UI
     TextField specialSecretTextField;
     TextField specialNumberTextField;
+    #endregion
+
+    #region Getters
+    public string FileName { get; private set; } = "name";
 
     public string SpecialSecretText { get => specialSecretTextField.value; }
-    public string SpecialNumberText { get => specialNumberTextField.value; }
 
-    public GraphInspectorView()
+    public string SpecialNumberText { get => specialNumberTextField.value; }
+    #endregion
+    #endregion
+
+    #region Functions
+    #region Init
+    public GraphInspectorElementsView()
     {
         CreateElements();
     }
 
     private void CreateElements()
     {
+        //create file name text field
         TextField fileNameTestField = new TextField("File Name");
         fileNameTestField.SetValueWithoutNotify(FileName);
-        fileNameTestField.MarkDirtyRepaint();//Triggers a repaint of the VisualElement on the next frame.
+        fileNameTestField.MarkDirtyRepaint();
         fileNameTestField.RegisterValueChangedCallback(evt => FileName = evt.newValue);
         Add(fileNameTestField);
 
-        Button saveButtons = new Button(()=> onSaveClick.Invoke()) { text = "Save Graph" };
+        //create save/load buttons
+        Button saveButtons = new Button(() => onSaveClick.Invoke()) { text = "Save Graph" };
         Add(saveButtons);
-
-        Button loadButtons = new Button(() => onLoadClick.Invoke()) {text = "Load Graph" };
+        Button loadButtons = new Button(() => onLoadClick.Invoke()) { text = "Load Graph" };
         Add(loadButtons);
 
+        //additional data
         Add(new Label(" "));
         Add(new Label(" "));
         Add(new Label("Additional Data:"));
 
+        //special number text field
         specialNumberTextField = new TextField("My Special Number");
-        specialNumberTextField.MarkDirtyRepaint();//Triggers a repaint of the VisualElement on the next frame.
-
-        specialSecretTextField = new TextField("My Special Secret");
-        specialSecretTextField.MarkDirtyRepaint();//Triggers a repaint of the VisualElement on the next frame.
-
+        specialNumberTextField.MarkDirtyRepaint();
         specialNumberTextField.RegisterValueChangedCallback(evt => OnAdditionalDataChange());
-        specialSecretTextField.RegisterValueChangedCallback(evt => OnAdditionalDataChange());
-
         Add(specialNumberTextField);
+
+        //secret text field
+        specialSecretTextField = new TextField("My Special Secret");
+        specialSecretTextField.MarkDirtyRepaint();
+        specialSecretTextField.RegisterValueChangedCallback(evt => OnAdditionalDataChange());
         Add(specialSecretTextField);
+
         HideAdditionalDataFileds();
     }
 
+    #endregion
+
+    #region Handle Events
     private void OnAdditionalDataChange()
     {
         if (string.IsNullOrEmpty(specialNumberTextField.value))
@@ -62,6 +79,9 @@ public class GraphInspectorView : VisualElement
         onAdditionalDataChange.Invoke();
     }
 
+    #endregion
+
+    #region Actions
     public void HideAdditionalDataFileds()
     {
         specialSecretTextField.visible = false;
@@ -77,33 +97,17 @@ public class GraphInspectorView : VisualElement
         specialSecretTextField.SetValueWithoutNotify(additionalData.mySpecialSecret);
     }
 
-    public void RegisterToOnSaveClick(UnityAction action)
-    {
-        onSaveClick.AddListener(action);
-    }
+    public void RegisterToOnSaveClick(UnityAction action) => onSaveClick.AddListener(action);
 
-    public void RemoveFromOnSaveClick(UnityAction action)
-    {
-        onSaveClick.RemoveListener(action);
-    }
+    public void RemoveFromOnSaveClick(UnityAction action) => onSaveClick.RemoveListener(action);
 
-    public void RegisterToOnLoadClick(UnityAction action)
-    {
-        onLoadClick.AddListener(action);
-    }
+    public void RegisterToOnLoadClick(UnityAction action) => onLoadClick.AddListener(action);
 
-    public void RemoveFromOnLoadClick(UnityAction action)
-    {
-        onLoadClick.RemoveListener(action);
-    }
+    public void RemoveFromOnLoadClick(UnityAction action) => onLoadClick.RemoveListener(action);
 
-    public void RegisterToOnAdditionalDataChange(UnityAction action)
-    {
-        onAdditionalDataChange.AddListener(action);
-    }
+    public void RegisterToOnAdditionalDataChange(UnityAction action) => onAdditionalDataChange.AddListener(action);
 
-    public void RemoveFromOnAdditionalDataChange(UnityAction action)
-    {
-        onAdditionalDataChange.RemoveListener(action);
-    }
+    public void RemoveFromOnAdditionalDataChange(UnityAction action) => onAdditionalDataChange.RemoveListener(action);
+    #endregion
+    #endregion
 }
