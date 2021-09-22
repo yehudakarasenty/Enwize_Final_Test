@@ -11,6 +11,7 @@ using UnityEngine.UIElements;
 public class GraphViewView : GraphView
 {
     private readonly Vector2 nodeSize = new Vector2(150, 200);
+    private int connectedCounter = 0;
 
     public GraphViewView()
     {
@@ -35,19 +36,35 @@ public class GraphViewView : GraphView
 
         CreateMiniMap();
         unserializeAndPaste += OnDuplicateClicked;
-        graphViewChanged = mGraphViewChanged;
+        graphViewChanged = GraphChanged;
     }
 
-    private GraphViewChange mGraphViewChanged(GraphViewChange graphViewChange)
+    private GraphViewChange GraphChanged(GraphViewChange graphViewChange)
     {
-        UpdateNodesTitles();
+        UpdateNodesTitles(); //TODO
         return graphViewChange;
     }
 
     private void UpdateNodesTitles()
     {
-        //TODO
+        return;
+        nodes.ForEach(x => x.title = "not connected");
+        connectedCounter = 0;
+        Node firstNode = nodes.ToList()[0];
+        firstNode.title = "Start";
+        MarkAsConnected(((Port)firstNode.outputContainer[0]).node);
         Debug.LogError("UpdateNodesTitles");
+    }
+
+    private void MarkAsConnected(Node node)
+    {
+        Debug.Break();
+        Debug.LogError("connectedCounter: " + connectedCounter);
+        connectedCounter++;
+        node.title = "Node: " + connectedCounter;
+        if (node.outputContainer.childCount > 0)
+            for (int i = 0; i < node.outputContainer.childCount; i++)
+                MarkAsConnected(((Port)node.outputContainer[i]).node);
     }
 
     private void OnDuplicateClicked(string operationName, string data)
