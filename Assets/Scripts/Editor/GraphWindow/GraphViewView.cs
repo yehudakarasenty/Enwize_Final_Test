@@ -120,7 +120,7 @@ public class GraphViewView : GraphView
         node.RefreshExpandedState();
         node.RefreshPorts();
         node.SetPosition(new Rect(position, nodeSize));
-
+        node.styleSheets.Add(Resources.Load<StyleSheet>("Node"));
         AddElement(node);
 
         return node;
