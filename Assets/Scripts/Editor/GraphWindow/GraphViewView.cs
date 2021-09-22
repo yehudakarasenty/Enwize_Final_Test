@@ -35,6 +35,19 @@ public class GraphViewView : GraphView
 
         CreateMiniMap();
         unserializeAndPaste += OnDuplicateClicked;
+        graphViewChanged = mGraphViewChanged;
+    }
+
+    private GraphViewChange mGraphViewChanged(GraphViewChange graphViewChange)
+    {
+        UpdateNodesTitles();
+        return graphViewChange;
+    }
+
+    private void UpdateNodesTitles()
+    {
+        //TODO
+        Debug.LogError("UpdateNodesTitles");
     }
 
     private void OnDuplicateClicked(string operationName, string data)
@@ -57,6 +70,8 @@ public class GraphViewView : GraphView
             {
                 Edge edge = (Edge)selectable;
                 NodeView baseNode = (NodeView)edge.output.node;
+                if (baseNode.type == GraphNodeType.ENTRY_NODE)
+                    continue;
                 NodeView targetNode = (NodeView)edge.input.node;
                 if (selection.Contains(baseNode) && selection.Contains(targetNode))
                 {
@@ -82,14 +97,14 @@ public class GraphViewView : GraphView
 
     private Port GeneratePort(NodeView node, Direction portDiraction, Port.Capacity capacity = Port.Capacity.Single)
     {
-        return node.InstantiatePort(Orientation.Horizontal, portDiraction, capacity, typeof(float)); // Arbitrary type
+        return node.InstantiatePort(Orientation.Horizontal, portDiraction, capacity, typeof(float));
     }
 
     public NodeView CreateNode(GraphNodeType nodeType, Vector2 position, string guid = "")
     {
         NodeView node = new NodeView
         {
-            title = nodeType == GraphNodeType.ENTRY_NODE? "Start" : "not connected  (" + nodeType.ToString().ToLower().Replace('_','-') +")", //TODO need to be automatic
+            title = nodeType == GraphNodeType.ENTRY_NODE? "Start" : "not connected  (" + nodeType.ToString().ToLower().Replace('_','-') +")",
             GUID = string.IsNullOrEmpty(guid) ? Guid.NewGuid().ToString() : guid,
             type = nodeType
         };
@@ -123,7 +138,6 @@ public class GraphViewView : GraphView
         AddStyle(node);
 
         AddElement(node);
-
         return node;
     }
 

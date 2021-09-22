@@ -1,3 +1,7 @@
+NodeView:selected
+{
+	background-color: rgb(180,0,180);
+}
 NodeView
 {
 	background-color: rgb(0,180,180);
