@@ -107,25 +107,13 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
             Node baseNode = graph.nodes.ToList().First(x => ((NodeView)x).GUID == link.BaseNodeGuid);
             Node targetNode = graph.nodes.ToList().First(x => ((NodeView)x).GUID == link.TargetNodeGuid);
             int portIndex = int.Parse(link.portName.Substring(link.portName.IndexOf('-') + 1));
-            LinkNodesTogether((Port)baseNode.outputContainer[portIndex], (Port)targetNode.inputContainer[0]);
+            graph.LinkNodesTogether((Port)baseNode.outputContainer[portIndex], (Port)targetNode.inputContainer[0]);
         }
     }
 
     public void ClearGraph()
     {
         graph.ClearGraph();
-    }
-
-    private void LinkNodesTogether(Port outputSocket, Port inputSocket)
-    {
-        Edge tempEdge = new Edge()
-        {
-            output = outputSocket,
-            input = inputSocket
-        };
-        tempEdge.input.Connect(tempEdge);
-        tempEdge.output.Connect(tempEdge);
-        graph.Add(tempEdge);
     }
 
     public void RegisterToOnCreateNodeClickEvent(UnityAction<GraphNodeType> action) 

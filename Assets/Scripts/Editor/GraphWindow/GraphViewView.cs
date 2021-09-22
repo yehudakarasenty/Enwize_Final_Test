@@ -34,14 +34,43 @@ public class GraphViewView : GraphView
         CreateNode(GraphNodeType.ENTRY_NODE, new Vector2(100, 200));
 
         CreateMiniMap();
-        unserializeAndPaste += OnPast;
+        unserializeAndPaste += OnDuplicateClicked;
     }
 
-    private void OnPast(string operationName, string data)
+    private void OnDuplicateClicked(string operationName, string data)
     {
-        //TODO Duplicate
-        Debug.LogError("operationName: " + operationName);
-        Debug.LogError("data: " + data);
+        List<ISelectable> toAddToSelection = new List<ISelectable>();
+        List<ISelectable> toRemoveFromSelection = new List<ISelectable>();
+        foreach (ISelectable selectable in selection)
+        {
+            if (selectable.GetType() == typeof(NodeView))
+            {
+                NodeView node = (NodeView)selectable;
+                if (node.type != GraphNodeType.ENTRY_NODE)
+                    toAddToSelection.Add(CreateNode(node.type, node.GetPosition().position - new Vector2(50, 50), node.GUID + "-Duplicate"));
+            }
+            toRemoveFromSelection.Add(selectable);
+        }
+        foreach (ISelectable selectable in selection)
+        {
+            if (selectable.GetType() == typeof(Edge))
+            {
+                Edge edge = (Edge)selectable;
+                NodeView baseNode = (NodeView)edge.output.node;
+                NodeView targetNode = (NodeView)edge.input.node;
+                if (selection.Contains(baseNode) && selection.Contains(targetNode))
+                {
+                    Node newBaseNode = nodes.ToList().First(x => ((NodeView)x).GUID == baseNode.GUID + "-Duplicate");
+                    Node newTargetNode = nodes.ToList().First(x => ((NodeView)x).GUID == targetNode.GUID + "-Duplicate");
+                    int portIndex = int.Parse(edge.output.portName.Substring(edge.output.portName.IndexOf('-') + 1));
+                    LinkNodesTogether((Port)newBaseNode.outputContainer[portIndex], (Port)newTargetNode.inputContainer[0]);
+                    toAddToSelection.Add(edge);
+                }
+                toRemoveFromSelection.Add(selectable);
+            }
+        }
+        toAddToSelection.ForEach(action: x => AddToSelection(x));
+        toRemoveFromSelection.ForEach(action: x => RemoveFromSelection(x));
     }
 
     private void CreateMiniMap()
@@ -141,5 +170,17 @@ public class GraphViewView : GraphView
                 .ForEach(edge => RemoveElement(edge));
             RemoveElement(node);
         }
+    }
+
+    public void LinkNodesTogether(Port outputSocket, Port inputSocket)
+    {
+        Edge tempEdge = new Edge()
+        {
+            output = outputSocket,
+            input = inputSocket
+        };
+        tempEdge.input.Connect(tempEdge);
+        tempEdge.output.Connect(tempEdge);
+        Add(tempEdge);
     }
 }
