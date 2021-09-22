@@ -45,9 +45,9 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
     {
         Toolbar toolbar = new Toolbar();
 
-        Button extraWindowOpenButton = new Button(() => { GetWindow<GraphInspectorWindowView>().titleContent = new GUIContent("Editor Window"); });
-        extraWindowOpenButton.text = "Open Extra Editor Window";
-        toolbar.Add(extraWindowOpenButton);
+        Button inspectorWindowOpenButton = new Button(() => { GetWindow<GraphInspectorWindowView>().titleContent = new GUIContent("Inspector Window"); });
+        inspectorWindowOpenButton.text = "Open Inspector Window";
+        toolbar.Add(inspectorWindowOpenButton);
 
         Button nodeCreateButton1 = new Button(() => createNodeButtonClickEvent.Invoke(GraphNodeType.NODE_1));
         nodeCreateButton1.text = "Create Node Type 1";
@@ -128,7 +128,7 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
         graph.Add(tempEdge);
     }
 
-    public void RegisterToOnCreateNodeClickEvent(UnityAction<GraphNodeType> action)
+    public void RegisterToOnCreateNodeClickEvent(UnityAction<GraphNodeType> action) 
     {
         createNodeButtonClickEvent.AddListener(action);
     }
