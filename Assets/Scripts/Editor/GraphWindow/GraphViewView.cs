@@ -161,7 +161,6 @@ public class GraphViewView : GraphView
 
         AddElement(node);
         EditorCoroutineUtility.StartCoroutine(UpdateNodesTitles(), this);
-
         return node;
     }
 
@@ -226,9 +225,12 @@ public class GraphViewView : GraphView
     {
         foreach (NodeView node in nodes.ToList().Cast<NodeView>().ToList())
         {
-            edges.ToList().Where(x => x.input.node == node).ToList()
-                .ForEach(edge => RemoveElement(edge));
-            RemoveElement(node);
+            if (node.type != GraphNodeType.ENTRY_NODE)
+            {
+                edges.ToList().Where(x => x.input.node == node).ToList()
+                    .ForEach(edge => RemoveElement(edge));
+                RemoveElement(node);
+            }
         }
     }
 
