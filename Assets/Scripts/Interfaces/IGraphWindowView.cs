@@ -10,6 +10,7 @@ public interface IGraphWindowView
     void ClearGraph();
     void RegisterToOnCreateNodeClickEvent(UnityAction<GraphNodeType> action);
     void RegisterToOnNodesSelectionChange(UnityAction action);
-    void CreateNode(GraphNodeType nodeType, Vector2 position);
+    void CreateNode(GraphNodeType nodeType, Vector2 position, NodeExtraData extraData);
     List<GraphNodeData> GetNodesSelectionList();
+    void InjectExtraDataToSelectionNodes(NodeExtraData nodeExtraData);
 }

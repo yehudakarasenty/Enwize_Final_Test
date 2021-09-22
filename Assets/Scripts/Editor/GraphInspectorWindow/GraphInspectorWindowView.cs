@@ -8,8 +8,6 @@ public class GraphInspectorWindowView : EditorWindow, IGraphInspectorWindowView
 
     private GraphInspectorView view;
 
-    private UnityEvent onExtraDataChange = new UnityEvent();
-
     public void OnEnable()
     {
         mWindowController = SingleManager.Get<IGraphInspectorWindowController>();
@@ -29,7 +27,7 @@ public class GraphInspectorWindowView : EditorWindow, IGraphInspectorWindowView
         view.StretchToParentSize();
         rootVisualElement.Add(view);
     }
-    
+
     public void ShowExtraDataFields(NodeExtraData extraData)
     {
         view.ShowExtraDataFileds(extraData);
@@ -42,7 +40,7 @@ public class GraphInspectorWindowView : EditorWindow, IGraphInspectorWindowView
 
     public void RegisterToOnExtraDataFieldsChange(UnityAction action)
     {
-        onExtraDataChange.AddListener(action);
+        view.RegisterToOnExtraDataChange(action);
     }
 
     private void SaveClicked()
@@ -65,9 +63,9 @@ public class GraphInspectorWindowView : EditorWindow, IGraphInspectorWindowView
         mWindowController.LoadClicked(view.FileName);
     }
 
-    public void UpdateView()
+    public NodeExtraData GetNodeExtraDataFields()
     {
-        //TODO
+        return new NodeExtraData(int.Parse(view.SpecialNumberText), view.SpecialSecretText);
     }
 
     public void OnDisable()

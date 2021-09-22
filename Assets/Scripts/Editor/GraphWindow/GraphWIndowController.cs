@@ -8,6 +8,7 @@ public class GraphWIndowController : IGraphWindowController
     private const string FILE_PATH = "C:/Users/yehud/Desktop/JsonsFiles/"; //TODO: to config
 
     private IGraphWindowView mView;
+    private IGraphInspectorWindowController mGraphInspectorWindowController;
 
     public List<GraphNodeData> NodesSelections => mView.GetNodesSelectionList();
 
@@ -21,7 +22,14 @@ public class GraphWIndowController : IGraphWindowController
 
     public void InitDependencies()
     {
-        
+        mGraphInspectorWindowController = SingleManager.Get<IGraphInspectorWindowController>();
+        mGraphInspectorWindowController.RegisterToOnExtraDataFieldsChange(OnExtraDataInspectorChange);
+    }
+
+    private void OnExtraDataInspectorChange()
+    {
+        NodeExtraData nodeExtraData = mGraphInspectorWindowController.NodeExtraDataFields();
+        mView.InjectExtraDataToSelectionNodes(nodeExtraData);
     }
 
     public void SetView(IGraphWindowView view)
@@ -40,7 +48,7 @@ public class GraphWIndowController : IGraphWindowController
 
     private void OnCreateNodeButtonClick(GraphNodeType nodeType)
     {
-        mView.CreateNode(nodeType, Vector2.zero);
+        mView.CreateNode(nodeType, Vector2.zero, new NodeExtraData());
     }
 
     public void LoadGraph(string fileName)

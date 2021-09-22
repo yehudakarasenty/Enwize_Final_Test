@@ -74,9 +74,9 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
         rootVisualElement.Add(toolbar);
     }
 
-    public void CreateNode(GraphNodeType nodeType, Vector2 position)
+    public void CreateNode(GraphNodeType nodeType, Vector2 position, NodeExtraData extraData)
     {
-        graph.CreateNode(nodeType, position);
+        graph.CreateNode(nodeType, position, extraData);
     }
 
     public GraphData GetGraphData()
@@ -88,7 +88,8 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
             {
                 GUID = node.GUID,
                 Position = node.GetPosition().position,
-                type = node.Type
+                type = node.Type,
+                extraData = node.NodeExtraData
             });
         }
         foreach (Edge edge in graph.edges.ToList())
@@ -107,9 +108,7 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
     {
         ClearGraph();
         foreach (GraphNodeData nodeData in graphData.nodes)
-        {
-            graph.CreateNode(nodeData.type, nodeData.Position, nodeData.GUID);
-        }
+            graph.CreateNode(nodeData.type, nodeData.Position, nodeData.extraData, nodeData.GUID);
 
         foreach (GraphNodeLinkData link in graphData.links)
         {
@@ -154,6 +153,18 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
             }
         }
         return nodesSelection;
+    }
+
+    public void InjectExtraDataToSelectionNodes(NodeExtraData nodeExtraData)
+    {
+        foreach (ISelectable selectable in graph.selection)
+        {
+            if (selectable.GetType() == typeof(NodeView))
+            {
+                NodeView node = (NodeView)selectable;
+                node.NodeExtraData = new NodeExtraData(nodeExtraData);
+            }
+        }
     }
 
     public void OnDisable()

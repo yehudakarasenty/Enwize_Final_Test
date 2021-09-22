@@ -1,7 +1,11 @@
-﻿public class GraphInspectorController : IGraphInspectorWindowController
+﻿using UnityEngine.Events;
+
+public class GraphInspectorController : IGraphInspectorWindowController
 {
     private IGraphWindowController mGraphWindowController;
     private IGraphInspectorWindowView mView;
+
+    private UnityEvent onExtraDataFieldsChange = new UnityEvent();
 
     public GraphInspectorController()
     {
@@ -35,6 +39,8 @@
     {
         mView = view;
         mView.ConsturctView();
+        mView.RegisterToOnExtraDataFieldsChange(OnExtraDataFieldsChange);
+        NodeSelectionsChange();
     }
 
     public void LoadClicked(string fileName)
@@ -45,5 +51,23 @@
     public void SaveClicked(string fileName)
     {
         mGraphWindowController.SaveGraph(fileName);
+    }
+
+    public void RegisterToOnExtraDataFieldsChange(UnityAction action)
+    {
+        onExtraDataFieldsChange.AddListener(action);
+    }
+
+    private void OnExtraDataFieldsChange()
+    {
+        onExtraDataFieldsChange.Invoke();
+    }
+
+    public NodeExtraData NodeExtraDataFields()
+    {
+        if (mView != null)
+            return mView.GetNodeExtraDataFields();
+        else
+            return new NodeExtraData();
     }
 }

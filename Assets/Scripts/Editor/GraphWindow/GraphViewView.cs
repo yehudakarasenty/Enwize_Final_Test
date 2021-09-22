@@ -36,7 +36,7 @@ public class GraphViewView : GraphView
         gridBackground.StretchToParentSize();
 
         //Create entry node
-        CreateNode(GraphNodeType.ENTRY_NODE, new Vector2(100, 200));
+        CreateNode(GraphNodeType.ENTRY_NODE, new Vector2(100, 200), new NodeExtraData()); ;
 
         CreateMiniMap();
         unserializeAndPaste += OnDuplicateClicked;
@@ -90,7 +90,7 @@ public class GraphViewView : GraphView
             {
                 NodeView node = (NodeView)selectable;
                 if (node.Type != GraphNodeType.ENTRY_NODE)
-                    toAddToSelection.Add(CreateNode(node.Type, node.GetPosition().position - new Vector2(50, 50), node.GUID + "-Duplicate"));
+                    toAddToSelection.Add(CreateNode(node.Type, node.GetPosition().position - new Vector2(50, 50),new NodeExtraData(node.NodeExtraData), node.GUID + "-Duplicate"));
             }
             toRemoveFromSelection.Add(selectable);
         }
@@ -130,10 +130,10 @@ public class GraphViewView : GraphView
         return node.InstantiatePort(Orientation.Horizontal, portDiraction, capacity, typeof(float));
     }
 
-    public NodeView CreateNode(GraphNodeType nodeType, Vector2 position, string guid = "")
+    public NodeView CreateNode(GraphNodeType nodeType, Vector2 position, NodeExtraData extraData , string guid = "")
     {
         string GUID = string.IsNullOrEmpty(guid) ? Guid.NewGuid().ToString() : guid;
-        NodeView node = new NodeView(GUID, nodeType, new NodeExtraData());
+        NodeView node = new NodeView(GUID, nodeType, extraData);
 
         if (nodeType != GraphNodeType.ENTRY_NODE)
         {

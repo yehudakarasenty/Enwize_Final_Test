@@ -1,4 +1,5 @@
-﻿using UnityEngine.Events;
+﻿using System.Text.RegularExpressions;
+using UnityEngine.Events;
 using UnityEngine.UIElements;
 
 public class GraphInspectorView : VisualElement
@@ -11,6 +12,9 @@ public class GraphInspectorView : VisualElement
 
     TextField specialSecretTextField;
     TextField specialNumberTextField;
+
+    public string SpecialSecretText { get => specialSecretTextField.value; }
+    public string SpecialNumberText { get => specialNumberTextField.value; }
 
     public GraphInspectorView()
     {
@@ -32,18 +36,27 @@ public class GraphInspectorView : VisualElement
 
         Add(fileNameTestField);
 
-        specialNumberTextField = new TextField("My Special Number");
+        specialNumberTextField = new TextField("My Special Number"); //TODO Only numbers input
         specialNumberTextField.MarkDirtyRepaint();//TO Understand
 
         specialSecretTextField = new TextField("My Special Secret");
         specialSecretTextField.MarkDirtyRepaint();//TO Understand
 
-        specialNumberTextField.RegisterValueChangedCallback(evt => onExtraDataChange.Invoke());
-        specialSecretTextField.RegisterValueChangedCallback(evt => onExtraDataChange.Invoke());
+        specialNumberTextField.RegisterValueChangedCallback(evt => OnExtraDataChange());
+        specialSecretTextField.RegisterValueChangedCallback(evt => OnExtraDataChange());
 
         Add(specialNumberTextField);
         Add(specialSecretTextField);
         HideExtraDataFileds();
+    }
+
+    private void OnExtraDataChange()
+    {
+        if (string.IsNullOrEmpty(specialNumberTextField.value))
+            specialNumberTextField.SetValueWithoutNotify("0");
+        else
+            specialNumberTextField.SetValueWithoutNotify(Regex.Replace(specialNumberTextField.value, "[^0-9]", ""));
+        onExtraDataChange.Invoke();
     }
 
     public void HideExtraDataFileds()
