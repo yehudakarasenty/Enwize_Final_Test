@@ -36,7 +36,7 @@ public class GraphInspectorView : VisualElement
 
         Add(fileNameTestField);
 
-        specialNumberTextField = new TextField("My Special Number"); //TODO Only numbers input
+        specialNumberTextField = new TextField("My Special Number");
         specialNumberTextField.MarkDirtyRepaint();//TO Understand
 
         specialSecretTextField = new TextField("My Special Secret");
