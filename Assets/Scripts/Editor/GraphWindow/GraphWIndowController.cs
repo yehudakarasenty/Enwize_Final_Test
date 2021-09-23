@@ -8,6 +8,11 @@ using UnityEngine.Events;
 /// </summary>
 public class GraphWindowController : IGraphWindowController
 {
+    #region Const
+    private const string GRAPH_DATA_KEY_FOR_EDITOR_MODE = "LastGraphDataEditorMode";
+    private const string GRAPH_DATA_KEY_FOR_PLAY_MODE = "LastGraphDataPlayMode";
+    #endregion
+
     #region Members
     #region Dependecis
     private IGraphInspectorWindowController mGraphInspectorWindowController;
@@ -43,6 +48,11 @@ public class GraphWindowController : IGraphWindowController
         mView.ConsturctGraph();
         mView.RegisterToOnCreateNodeClickEvent(new UnityAction<GraphNodeType>(OnCreateNodeButtonClick));
         mView.RegisterToOnNodesSelectionChange(() => onNodesSelectionsChange.Invoke());
+        mView.RegisterToOnDisable(() => SaveEditorPlayGraph());
+        if (EditorApplication.isPlaying)
+            LoadPlayModeGraph();
+        else
+            LoadEditorModeGraph();
     }
     #endregion
 
@@ -55,8 +65,8 @@ public class GraphWindowController : IGraphWindowController
 
     void PlayModeChanged(PlayModeStateChange playModeState)
     {
-        if (mView != null)
-            mView.ClearGraph();
+        if(playModeState == PlayModeStateChange.EnteredPlayMode || playModeState == PlayModeStateChange.EnteredEditMode)
+            LoadEditorModeGraph();
     }
 
     private void OnCreateNodeButtonClick(GraphNodeType nodeType) => mView.CreateNode(nodeType, Vector2.zero, new NodeAdditionalData());
@@ -67,14 +77,30 @@ public class GraphWindowController : IGraphWindowController
     {
         if (mView != null)
             mView.LoadGraphData(JsonService.ReadJsonFile<GraphData>(filePath + fileName));
-        Debug.Log("Graph Loaded");
+    }
+
+    private void LoadPlayModeGraph()
+    {
+        mView.LoadGraphData(JsonService.JsonToObject<GraphData>(EditorPrefs.GetString(GRAPH_DATA_KEY_FOR_PLAY_MODE)));
+    }
+
+    private void LoadEditorModeGraph()
+    {
+        mView.LoadGraphData(JsonService.JsonToObject<GraphData>(EditorPrefs.GetString(GRAPH_DATA_KEY_FOR_EDITOR_MODE)));
     }
 
     public void SaveGraph(string fileName)
     {
         if (mView != null)
             JsonService.WriteJsonFile(mView.GetGraphData(), filePath + fileName);
-        Debug.Log("Graph Saved");
+    }
+
+    private void SaveEditorPlayGraph()
+    {
+        if (EditorApplication.isPlaying)
+            EditorPrefs.SetString(GRAPH_DATA_KEY_FOR_PLAY_MODE, JsonService.ObjectToJson(mView.GetGraphData()));
+        else
+            EditorPrefs.SetString(GRAPH_DATA_KEY_FOR_EDITOR_MODE, JsonService.ObjectToJson(mView.GetGraphData()));
     }
 
     public void RegisterToNodeSelectionsChange(UnityAction action) => onNodesSelectionsChange.AddListener(action);

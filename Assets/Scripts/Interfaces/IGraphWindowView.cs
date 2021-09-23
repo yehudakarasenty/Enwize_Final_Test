@@ -13,4 +13,5 @@ public interface IGraphWindowView
     void CreateNode(GraphNodeType nodeType, Vector2 position, NodeAdditionalData extraData);
     List<GraphNodeData> GetNodesSelectionList();
     void InjectAdditionalDataToSelectionNodes(NodeAdditionalData nodeExtraData);
+    void RegisterToOnDisable(UnityAction action);
 }

@@ -79,11 +79,14 @@ public class GraphViewElement : GraphView
 
     private IEnumerator UpdateNodesTitles()
     {
-        yield return null; //Changes are update in the end of the frame.
-        nodes.ForEach(x => x.title = ((NodeView)x).Type == GraphNodeType.ENTRY_NODE ? "Entry Point" : "not connected (" + ((NodeView)x).Type.ToString().ToLower().Replace('_', '-') + ")");
-        connectedCounter = 0;
-        NodeView firstNode = (NodeView)nodes.ToList()[0];
-        MarkAsConnected(firstNode);
+        if (nodes.ToList().Count != 0)
+        {
+            yield return null; //Changes are update in the end of the frame.
+            nodes.ForEach(x => x.title = ((NodeView)x).Type == GraphNodeType.ENTRY_NODE ? "Entry Point" : "not connected (" + ((NodeView)x).Type.ToString().ToLower().Replace('_', '-') + ")");
+            connectedCounter = 0;
+            NodeView firstNode = (NodeView)nodes.ToList()[0];
+            MarkAsConnected(firstNode);
+        }
     }
 
     private void MarkAsConnected(NodeView node)
@@ -180,7 +183,7 @@ public class GraphViewElement : GraphView
 
     private IEnumerator NotifySelectionNoedsChange()
     {
-        //selections is update inly in the end of the frame
+        //selections is update only in the end of the frame
         yield return null;
         onSelectionNoedsChange.Invoke();
     }
@@ -188,12 +191,11 @@ public class GraphViewElement : GraphView
     public void ClearGraph()
     {
         foreach (NodeView node in nodes.ToList().Cast<NodeView>().ToList())
-            if (node.Type != GraphNodeType.ENTRY_NODE)
-            {
-                edges.ToList().Where(x => x.input.node == node).ToList()
-                    .ForEach(edge => RemoveElement(edge));
-                RemoveElement(node);
-            }
+        {
+            edges.ToList().Where(x => x.input.node == node).ToList()
+                .ForEach(edge => RemoveElement(edge));
+            RemoveElement(node);
+        }
     }
 
     public void LinkNodesTogether(Port outputSocket, Port inputSocket)

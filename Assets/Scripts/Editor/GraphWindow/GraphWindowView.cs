@@ -16,7 +16,8 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
 
     private CreateNodeButtonClickEvent createNodeButtonClickEvent = new CreateNodeButtonClickEvent();
 
-    private UnityEvent onSelectionChange = new UnityEvent();
+    private UnityEvent onSelectionChangeEvent = new UnityEvent();
+    private UnityEvent onDisableEvent = new UnityEvent();
     #endregion
 
     #region Functions
@@ -82,10 +83,11 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
     #endregion
 
     #region Handle Events
-    private void OnNoedsSelectionChange() => onSelectionChange.Invoke();
+    private void OnNoedsSelectionChange() => onSelectionChangeEvent.Invoke();
 
     public void OnDisable()
     {
+        onDisableEvent.Invoke();
         rootVisualElement.Remove(graph);
         GetWindow<GraphInspectorWindowView>().Close();
     }
@@ -99,17 +101,22 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
 
     public void LoadGraphData(GraphData graphData)
     {
-        ClearGraph();
-        foreach (GraphNodeData nodeData in graphData.nodes)
-            graph.CreateNode(nodeData.type, nodeData.Position, nodeData.additionalData, nodeData.GUID);
-
-        foreach (GraphNodeLinkData link in graphData.links)
+        if (graphData != null)
         {
-            Node baseNode = graph.nodes.ToList().First(x => ((NodeView)x).GUID == link.BaseNodeGuid);
-            Node targetNode = graph.nodes.ToList().First(x => ((NodeView)x).GUID == link.TargetNodeGuid);
-            int portIndex = int.Parse(link.portName.Substring(link.portName.IndexOf('-') + 1));
-            graph.LinkNodesTogether((Port)baseNode.outputContainer[portIndex], (Port)targetNode.inputContainer[0]);
+            ClearGraph();
+            foreach (GraphNodeData nodeData in graphData.Nodes)
+                graph.CreateNode(nodeData.Type, nodeData.Position, nodeData.AdditionalData, nodeData.GUID);
+
+            foreach (GraphNodeLinkData link in graphData.Links)
+            {
+                Node baseNode = graph.nodes.ToList().First(x => ((NodeView)x).GUID == link.BaseNodeGuid);
+                Node targetNode = graph.nodes.ToList().First(x => ((NodeView)x).GUID == link.TargetNodeGuid);
+                int portIndex = int.Parse(link.PortName.Substring(link.PortName.IndexOf('-') + 1));
+                graph.LinkNodesTogether((Port)baseNode.outputContainer[portIndex], (Port)targetNode.inputContainer[0]);
+            }
         }
+        else
+            Debug.Log("Loading default graph");
     }
 
     public void ClearGraph() => graph.ClearGraph();
@@ -121,7 +128,12 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
 
     public void RegisterToOnNodesSelectionChange(UnityAction action)
     {
-        onSelectionChange.AddListener(action);
+        onSelectionChangeEvent.AddListener(action);
+    }
+
+    public void RegisterToOnDisable(UnityAction action)
+    {
+        onDisableEvent.AddListener(action);
     }
 
     public void InjectAdditionalDataToSelectionNodes(NodeAdditionalData nodeAdditionalData)
@@ -138,26 +150,30 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
     #endregion
 
     #region GetData
+    /// <summary>
+    /// Get all Nodes and connections except Entry Node 
+    /// </summary>
+    /// <returns></returns>
     public GraphData GetGraphData()
     {
         GraphData graphData = new GraphData();
         foreach (NodeView node in graph.nodes.ToList().Cast<NodeView>().ToList())
         {
-            graphData.nodes.Add(new GraphNodeData()
+            graphData.Nodes.Add(new GraphNodeData()
             {
                 GUID = node.GUID,
                 Position = node.GetPosition().position,
-                type = node.Type,
-                additionalData = node.NodeAdditionalData
+                Type = node.Type,
+                AdditionalData = node.NodeAdditionalData
             });
         }
         foreach (Edge edge in graph.edges.ToList())
         {
-            graphData.links.Add(new GraphNodeLinkData()
+            graphData.Links.Add(new GraphNodeLinkData()
             {
                 BaseNodeGuid = ((NodeView)edge.output.node).GUID,
                 TargetNodeGuid = ((NodeView)edge.input.node).GUID,
-                portName = edge.output.portName
+                PortName = edge.output.portName
             });
         }
         return graphData;
@@ -174,10 +190,10 @@ public class GraphWindowView : EditorWindow, IGraphWindowView
                 if (node.Type != GraphNodeType.ENTRY_NODE)
                     nodesSelection.Add(new GraphNodeData()
                     {
-                        additionalData = node.NodeAdditionalData,
+                        AdditionalData = node.NodeAdditionalData,
                         GUID = node.GUID,
                         Position = node.GetPosition().position,
-                        type = node.Type
+                        Type = node.Type
                     });
             }
         }

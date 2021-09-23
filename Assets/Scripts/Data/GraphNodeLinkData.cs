@@ -7,5 +7,5 @@ public class GraphNodeLinkData
     [JsonProperty("TargetNodeGuid")]
     public string TargetNodeGuid;
     [JsonProperty("portName")]
-    public string portName;
+    public string PortName;
 }

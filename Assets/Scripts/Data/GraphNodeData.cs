@@ -11,7 +11,7 @@ public class GraphNodeData
     [JsonProperty("Position")]
     public Vector2 Position;
     [JsonProperty("Type")]
-    public GraphNodeType type;
+    public GraphNodeType Type;
     [JsonProperty("ExtraData")]
-    public NodeAdditionalData additionalData;
+    public NodeAdditionalData AdditionalData;
 }

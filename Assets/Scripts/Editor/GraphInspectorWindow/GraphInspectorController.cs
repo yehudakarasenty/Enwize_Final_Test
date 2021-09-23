@@ -40,7 +40,7 @@ public class GraphInspectorController : IGraphInspectorWindowController
     #region Actions
     private bool AdditionalDataIsEqual(NodeAdditionalData node1, NodeAdditionalData node2)
     {
-        return node1.mySpecialNumber == node2.mySpecialNumber && node1.mySpecialSecret == node2.mySpecialSecret;
+        return node1.MySpecialNumber == node2.MySpecialNumber && node1.MySpecialSecret == node2.MySpecialSecret;
     }
 
     public void RegisterToOnAdditionalDataFieldsChange(UnityAction action)
@@ -67,8 +67,8 @@ public class GraphInspectorController : IGraphInspectorWindowController
             mView.HideAdditionalDataFields();
             if (mGraphWindowController.NodesSelections.Count > 0 &&
                  mGraphWindowController.NodesSelections.TrueForAll
-                 (x => AdditionalDataIsEqual(x.additionalData, mGraphWindowController.NodesSelections[0].additionalData)))
-                mView.ShowAdditionalDataFields(mGraphWindowController.NodesSelections[0].additionalData);
+                 (x => AdditionalDataIsEqual(x.AdditionalData, mGraphWindowController.NodesSelections[0].AdditionalData)))
+                mView.ShowAdditionalDataFields(mGraphWindowController.NodesSelections[0].AdditionalData);
         }
     }
 

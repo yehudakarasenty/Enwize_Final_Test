@@ -2,21 +2,21 @@
 public class NodeAdditionalData
 {
     [JsonProperty("mySpecialNumber")]
-    public int mySpecialNumber;
+    public int MySpecialNumber;
     [JsonProperty("mySpecialSecret ")]
-    public string mySpecialSecret;
+    public string MySpecialSecret;
 
     public NodeAdditionalData(){}
 
     public NodeAdditionalData(NodeAdditionalData copy)
     {
-        mySpecialNumber = copy.mySpecialNumber;
-        mySpecialSecret = copy.mySpecialSecret;
+        MySpecialNumber = copy.MySpecialNumber;
+        MySpecialSecret = copy.MySpecialSecret;
     }
 
     public NodeAdditionalData(int mySpecialNumber, string mySpecialSecret)
     {
-        this.mySpecialNumber = mySpecialNumber;
-        this.mySpecialSecret = mySpecialSecret;
+        MySpecialNumber = mySpecialNumber;
+        MySpecialSecret = mySpecialSecret;
     }
 }

@@ -93,8 +93,8 @@ public class GraphInspectorElementsView : VisualElement
         specialNumberTextField.visible = true;
         specialSecretTextField.visible = true;
 
-        specialNumberTextField.SetValueWithoutNotify(additionalData.mySpecialNumber.ToString());
-        specialSecretTextField.SetValueWithoutNotify(additionalData.mySpecialSecret);
+        specialNumberTextField.SetValueWithoutNotify(additionalData.MySpecialNumber.ToString());
+        specialSecretTextField.SetValueWithoutNotify(additionalData.MySpecialSecret);
     }
 
     public void RegisterToOnSaveClick(UnityAction action) => onSaveClick.AddListener(action);
